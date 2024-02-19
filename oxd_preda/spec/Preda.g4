@@ -267,6 +267,8 @@ InterfaceKeyword : 'interface';
 ImplementsKeyword : 'implements';
 DeployKeyword : 'deploy';
 ConstructorKeyword : 'constructor';
+EventKeyword : 'event';
+EmitKeyword : 'emit';
 
 FloatType
   : 'float256' | 'float512' | 'float1024' ;
