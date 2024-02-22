@@ -221,6 +221,7 @@ private:
 	size_t ExportFunction(transpiler::FunctionRef functionRef);
 	void PropagateFunctionFlagAcrossCallingGraph();
 	void TraverseAllFunctions();
+	void DeclareEvent(PredaParser::EventDeclarationContext *ctx);
 
 public:
 	// interface inherited from PredaListener
@@ -258,4 +259,9 @@ public:
 	//virtual void exitRelayLambdaDefinition(PredaParser::RelayLambdaDefinitionContext *ctx) override;
 	virtual void enterPredaSource(PredaParser::PredaSourceContext * /*ctx*/) override;
   	//virtual void enterDoxygen(PredaParser::DoxygenContext * /*ctx*/) override;
+
+	virtual void PredaRealListener::enterEventDeclaration(PredaParser::EventDeclarationContext *ctx) override;
+	virtual void PredaRealListener::exitEventDeclaration(PredaParser::EventDeclarationContext *ctx) override;
+	virtual void PredaRealListener::enterEventStatement(PredaParser::EventStatementContext *ctx) override;
+	virtual void PredaRealListener::exitEventStatement(PredaParser::EventStatementContext *ctx) override;
 };

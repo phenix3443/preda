@@ -2009,6 +2009,10 @@ void PredaRealListener::enterContractDefinition(PredaParser::ContractDefinitionC
 		{
 			DefineConstVariable(contractParts[i]->constVariableDeclaration());
 		}
+		else if (contractParts[i]->eventDeclaration())
+		{
+			DeclareEvent(contractParts[i]->eventDeclaration());
+		}
 	}
 
 	// Generate code for enum types

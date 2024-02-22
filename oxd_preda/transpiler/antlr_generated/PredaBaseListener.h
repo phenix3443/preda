@@ -79,6 +79,9 @@ public:
   virtual void enterAccessSpecifier(PredaParser::AccessSpecifierContext * /*ctx*/) override { }
   virtual void exitAccessSpecifier(PredaParser::AccessSpecifierContext * /*ctx*/) override { }
 
+  virtual void enterEventDeclaration(PredaParser::EventDeclarationContext * /*ctx*/) override { }
+  virtual void exitEventDeclaration(PredaParser::EventDeclarationContext * /*ctx*/) override { }
+
   virtual void enterVariableDeclaration(PredaParser::VariableDeclarationContext * /*ctx*/) override { }
   virtual void exitVariableDeclaration(PredaParser::VariableDeclarationContext * /*ctx*/) override { }
 
@@ -114,6 +117,9 @@ public:
 
   virtual void enterExpressionStatement(PredaParser::ExpressionStatementContext * /*ctx*/) override { }
   virtual void exitExpressionStatement(PredaParser::ExpressionStatementContext * /*ctx*/) override { }
+
+  virtual void enterEventStatement(PredaParser::EventStatementContext * /*ctx*/) override { }
+  virtual void exitEventStatement(PredaParser::EventStatementContext * /*ctx*/) override { }
 
   virtual void enterIfStatement(PredaParser::IfStatementContext * /*ctx*/) override { }
   virtual void exitIfStatement(PredaParser::IfStatementContext * /*ctx*/) override { }

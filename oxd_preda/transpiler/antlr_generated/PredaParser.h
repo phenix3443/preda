@@ -28,11 +28,12 @@ public:
     ContractKeyword = 73, ImportKeyword = 74, FunctionKeyword = 75, PublicKeyword = 76, 
     ExportKeyword = 77, AsKeyword = 78, UsingKeyword = 79, InterfaceKeyword = 80, 
     ImplementsKeyword = 81, DeployKeyword = 82, ConstructorKeyword = 83, 
-    FloatType = 84, IntType = 85, UintType = 86, BooleanLiteral = 87, DecimalFloatLiteral = 88, 
-    DecimalIntegerLiteral = 89, DecimalIntegerLiteralBody = 90, AddressLiteral = 91, 
-    HashLiteral = 92, HexIntegerLiteral = 93, HexIntegerLiteralBody = 94, 
-    DecimalBigIntegerLiteral = 95, HexBigIntegerLiteral = 96, Identifier = 97, 
-    StringLiteral = 98, WS = 99, COMMENT = 100, LINE_COMMENT = 101
+    EventKeyword = 84, EmitKeyword = 85, FloatType = 86, IntType = 87, UintType = 88, 
+    BooleanLiteral = 89, DecimalFloatLiteral = 90, DecimalIntegerLiteral = 91, 
+    DecimalIntegerLiteralBody = 92, AddressLiteral = 93, HashLiteral = 94, 
+    HexIntegerLiteral = 95, HexIntegerLiteralBody = 96, DecimalBigIntegerLiteral = 97, 
+    HexBigIntegerLiteral = 98, Identifier = 99, StringLiteral = 100, WS = 101, 
+    COMMENT = 102, LINE_COMMENT = 103
   };
 
   enum {
@@ -42,18 +43,19 @@ public:
     RuleConstVariableDeclaration = 10, RuleScope = 11, RuleStructDefinition = 12, 
     RuleInterfaceDefinition = 13, RuleEnumDefinition = 14, RuleFunctionDefinition = 15, 
     RuleFunctionDeclaration = 16, RuleFunctionReturnTypeName = 17, RuleFunctionParameterList = 18, 
-    RuleFunctionParameter = 19, RuleAccessSpecifier = 20, RuleVariableDeclaration = 21, 
-    RuleTypeNameOrAuto = 22, RuleTypeName = 23, RuleFundamentalTypeName = 24, 
-    RuleBuiltInContainerTypeName = 25, RuleMapKeyTypeName = 26, RuleMapTypeName = 27, 
-    RuleArrayTypeName = 28, RuleUserDefinedTypeName = 29, RuleUserBlockStatement = 30, 
-    RuleStatement = 31, RuleExpressionStatement = 32, RuleIfStatement = 33, 
-    RuleIfWithBlock = 34, RuleElseWithBlock = 35, RuleElseIfWithBlock = 36, 
-    RuleWhileStatement = 37, RuleRelayStatement = 38, RuleRelayType = 39, 
-    RuleRelayLambdaDefinition = 40, RuleRelayLambdaParameter = 41, RuleForStatement = 42, 
-    RuleDoWhileStatement = 43, RuleContinueStatement = 44, RuleBreakStatement = 45, 
-    RuleReturnStatement = 46, RuleVariableDeclarationStatement = 47, RuleLocalVariableDeclaration = 48, 
-    RuleExpression = 49, RulePrimaryExpression = 50, RuleFunctionCallArguments = 51, 
-    RuleIdentifier = 52
+    RuleFunctionParameter = 19, RuleAccessSpecifier = 20, RuleEventDeclaration = 21, 
+    RuleVariableDeclaration = 22, RuleTypeNameOrAuto = 23, RuleTypeName = 24, 
+    RuleFundamentalTypeName = 25, RuleBuiltInContainerTypeName = 26, RuleMapKeyTypeName = 27, 
+    RuleMapTypeName = 28, RuleArrayTypeName = 29, RuleUserDefinedTypeName = 30, 
+    RuleUserBlockStatement = 31, RuleStatement = 32, RuleExpressionStatement = 33, 
+    RuleEventStatement = 34, RuleIfStatement = 35, RuleIfWithBlock = 36, 
+    RuleElseWithBlock = 37, RuleElseIfWithBlock = 38, RuleWhileStatement = 39, 
+    RuleRelayStatement = 40, RuleRelayType = 41, RuleRelayLambdaDefinition = 42, 
+    RuleRelayLambdaParameter = 43, RuleForStatement = 44, RuleDoWhileStatement = 45, 
+    RuleContinueStatement = 46, RuleBreakStatement = 47, RuleReturnStatement = 48, 
+    RuleVariableDeclarationStatement = 49, RuleLocalVariableDeclaration = 50, 
+    RuleExpression = 51, RulePrimaryExpression = 52, RuleFunctionCallArguments = 53, 
+    RuleIdentifier = 54
   };
 
   explicit PredaParser(antlr4::TokenStream *input);
@@ -87,6 +89,7 @@ public:
   class FunctionParameterListContext;
   class FunctionParameterContext;
   class AccessSpecifierContext;
+  class EventDeclarationContext;
   class VariableDeclarationContext;
   class TypeNameOrAutoContext;
   class TypeNameContext;
@@ -99,6 +102,7 @@ public:
   class UserBlockStatementContext;
   class StatementContext;
   class ExpressionStatementContext;
+  class EventStatementContext;
   class IfStatementContext;
   class IfWithBlockContext;
   class ElseWithBlockContext;
@@ -278,6 +282,7 @@ public:
     EnumDefinitionContext *enumDefinition();
     InterfaceDefinitionContext *interfaceDefinition();
     FunctionDefinitionContext *functionDefinition();
+    EventDeclarationContext *eventDeclaration();
 
     virtual void enterRule(antlr4::tree::ParseTreeListener *listener) override;
     virtual void exitRule(antlr4::tree::ParseTreeListener *listener) override;
@@ -506,6 +511,23 @@ public:
 
   AccessSpecifierContext* accessSpecifier();
 
+  class  EventDeclarationContext : public antlr4::ParserRuleContext {
+  public:
+    EventDeclarationContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    antlr4::tree::TerminalNode *EventKeyword();
+    IdentifierContext *identifier();
+    FunctionParameterListContext *functionParameterList();
+
+    virtual void enterRule(antlr4::tree::ParseTreeListener *listener) override;
+    virtual void exitRule(antlr4::tree::ParseTreeListener *listener) override;
+
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+   
+  };
+
+  EventDeclarationContext* eventDeclaration();
+
   class  VariableDeclarationContext : public antlr4::ParserRuleContext {
   public:
     VariableDeclarationContext(antlr4::ParserRuleContext *parent, size_t invokingState);
@@ -686,6 +708,7 @@ public:
     RelayStatementContext *relayStatement();
     VariableDeclarationStatementContext *variableDeclarationStatement();
     ExpressionStatementContext *expressionStatement();
+    EventStatementContext *eventStatement();
 
     virtual void enterRule(antlr4::tree::ParseTreeListener *listener) override;
     virtual void exitRule(antlr4::tree::ParseTreeListener *listener) override;
@@ -710,6 +733,23 @@ public:
   };
 
   ExpressionStatementContext* expressionStatement();
+
+  class  EventStatementContext : public antlr4::ParserRuleContext {
+  public:
+    EventStatementContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    antlr4::tree::TerminalNode *EventKeyword();
+    IdentifierContext *identifier();
+    FunctionCallArgumentsContext *functionCallArguments();
+
+    virtual void enterRule(antlr4::tree::ParseTreeListener *listener) override;
+    virtual void exitRule(antlr4::tree::ParseTreeListener *listener) override;
+
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+   
+  };
+
+  EventStatementContext* eventStatement();
 
   class  IfStatementContext : public antlr4::ParserRuleContext {
   public:
