@@ -39,7 +39,7 @@ namespace transpiler {
 		localScopes.emplace_back(LocalScope::Scope_Function, type);
 	}
 
-	void FunctionContext::PushAddtionalLocalScope(LocalScope::ScopeType scopeType, const char *debugName)
+	void FunctionContext::PushAdditionalLocalScope(LocalScope::ScopeType scopeType, const char *debugName)
 	{
 		assert(localScopes.size() > 0);
 		if (localScopes.size() == 0)

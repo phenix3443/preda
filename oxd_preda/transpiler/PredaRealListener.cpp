@@ -870,7 +870,7 @@ void PredaRealListener::enterReturnStatement(PredaParser::ReturnStatementContext
 
 void PredaRealListener::enterIfWithBlock(PredaParser::IfWithBlockContext *ctx)
 {
-	m_transpilerCtx.functionCtx.PushAddtionalLocalScope(transpiler::FunctionContext::LocalScope::Scope_If, "if");
+	m_transpilerCtx.functionCtx.PushAdditionalLocalScope(transpiler::FunctionContext::LocalScope::Scope_If, "if");
 
 	ExpressionParser::ExpressionResult expRes;
 	if (!m_expressionParser.ParseExpression(ctx->expression(), expRes))
@@ -897,7 +897,7 @@ void PredaRealListener::exitIfWithBlock(PredaParser::IfWithBlockContext *ctx)
 
 void PredaRealListener::enterElseWithBlock(PredaParser::ElseWithBlockContext *ctx)
 {
-	m_transpilerCtx.functionCtx.PushAddtionalLocalScope(transpiler::FunctionContext::LocalScope::Scope_Else, "else");
+	m_transpilerCtx.functionCtx.PushAdditionalLocalScope(transpiler::FunctionContext::LocalScope::Scope_Else, "else");
 
 	codeSerializer.AddLine("else {");
 	codeSerializer.PushIndent();
@@ -913,7 +913,7 @@ void PredaRealListener::exitElseWithBlock(PredaParser::ElseWithBlockContext *ctx
 
 void PredaRealListener::enterElseIfWithBlock(PredaParser::ElseIfWithBlockContext *ctx)
 {
-	m_transpilerCtx.functionCtx.PushAddtionalLocalScope(transpiler::FunctionContext::LocalScope::Scope_ElseIf, "elseif");
+	m_transpilerCtx.functionCtx.PushAdditionalLocalScope(transpiler::FunctionContext::LocalScope::Scope_ElseIf, "elseif");
 
 	ExpressionParser::ExpressionResult expRes;
 	if (!m_expressionParser.ParseExpression(ctx->expression(), expRes))
@@ -940,7 +940,7 @@ void PredaRealListener::exitElseIfWithBlock(PredaParser::ElseIfWithBlockContext 
 
 void PredaRealListener::enterWhileStatement(PredaParser::WhileStatementContext *ctx)
 {
-	m_transpilerCtx.functionCtx.PushAddtionalLocalScope(transpiler::FunctionContext::LocalScope::Scope_While, "while");
+	m_transpilerCtx.functionCtx.PushAdditionalLocalScope(transpiler::FunctionContext::LocalScope::Scope_While, "while");
 
 	ExpressionParser::ExpressionResult expRes;
 	if (!m_expressionParser.ParseExpression(ctx->expression(), expRes))
@@ -967,7 +967,7 @@ void PredaRealListener::exitWhileStatement(PredaParser::WhileStatementContext *c
 
 void PredaRealListener::enterDoWhileStatement(PredaParser::DoWhileStatementContext *ctx)
 {
-	m_transpilerCtx.functionCtx.PushAddtionalLocalScope(transpiler::FunctionContext::LocalScope::Scope_DoWhile, "dowhile");
+	m_transpilerCtx.functionCtx.PushAdditionalLocalScope(transpiler::FunctionContext::LocalScope::Scope_DoWhile, "dowhile");
 
 	codeSerializer.AddLine("do { prlrt::burn_gas_loop();");
 	codeSerializer.PushIndent();
@@ -994,7 +994,7 @@ void PredaRealListener::exitDoWhileStatement(PredaParser::DoWhileStatementContex
 
 void PredaRealListener::enterForStatement(PredaParser::ForStatementContext *ctx)
 {
-	m_transpilerCtx.functionCtx.PushAddtionalLocalScope(transpiler::FunctionContext::LocalScope::Scope_For, "for");
+	m_transpilerCtx.functionCtx.PushAdditionalLocalScope(transpiler::FunctionContext::LocalScope::Scope_For, "for");
 
 	std::string codeOutput = "for (";
 
@@ -1057,7 +1057,7 @@ void PredaRealListener::exitForStatement(PredaParser::ForStatementContext *ctx)
 
 void PredaRealListener::enterUserBlockStatement(PredaParser::UserBlockStatementContext *ctx)
 {
-	m_transpilerCtx.functionCtx.PushAddtionalLocalScope(transpiler::FunctionContext::LocalScope::Scope_UserBlock, "userblock");
+	m_transpilerCtx.functionCtx.PushAdditionalLocalScope(transpiler::FunctionContext::LocalScope::Scope_UserBlock, "userblock");
 
 	codeSerializer.AddLine("{");
 	codeSerializer.PushIndent();
@@ -1599,11 +1599,11 @@ void PredaRealListener::ForwardDeclareFunction(PredaParser::FunctionDefinitionCo
 		return;
 	}
 
-	ForwardDeclaredContractFunction forwardDeclearedFunc;
-	forwardDeclearedFunc.declaredFunc.functionIdentifier = pDefinedFunction;
-	forwardDeclearedFunc.declaredFunc.overloadIndex = pDefinedFunction->qualifiedType.baseConcreteType->vOverloadedFunctions.size() - 1;
-	forwardDeclearedFunc.ctx = ctx;
-	m_forwardDeclaredFunctions.push_back(forwardDeclearedFunc);
+	ForwardDeclaredContractFunction forwardDeclaredFunc;
+	forwardDeclaredFunc.declaredFunc.functionIdentifier = pDefinedFunction;
+	forwardDeclaredFunc.declaredFunc.overloadIndex = pDefinedFunction->qualifiedType.baseConcreteType->vOverloadedFunctions.size() - 1;
+	forwardDeclaredFunc.ctx = ctx;
+	m_forwardDeclaredFunctions.push_back(forwardDeclaredFunc);
 	m_functionDefinitionContext2ForwardDeclaredFunctions.insert(std::make_pair(ctx, m_forwardDeclaredFunctions.size() - 1));
 
 	// generate export signature
@@ -1617,7 +1617,7 @@ void PredaRealListener::ForwardDeclareFunction(PredaParser::FunctionDefinitionCo
 
 	if (bNeedToExport)
 	{
-		size_t exportSlot = ExportFunction(forwardDeclearedFunc.declaredFunc);
+		size_t exportSlot = ExportFunction(forwardDeclaredFunc.declaredFunc);
 
 		// reserved functions are only for contracts
 		if (thisType->typeCategory == transpiler::ConcreteType::ContractType)
@@ -1809,9 +1809,9 @@ void PredaRealListener::DefineStruct(PredaParser::StructDefinitionContext *ctx)
 	// struct members cannot reference the struct type itself. Therefore their types are checked before defining the struct type.
 	std::vector<ConcreteTypePtr> memberTypes;
 	{
-		std::vector<PredaParser::VariableDeclarationContext*> memberVariableDclarations = ctx->variableDeclaration();
-		for (size_t i = 0; i < memberVariableDclarations.size(); i++)
-			 memberTypes.push_back(m_identifierHub.GetTypeFromTypeNameContext(memberVariableDclarations[i]->typeName()));
+		std::vector<PredaParser::VariableDeclarationContext *> memberVariableDeclarations = ctx->variableDeclaration();
+		for (size_t i = 0; i < memberVariableDeclarations.size(); i++)
+			memberTypes.push_back(m_identifierHub.GetTypeFromTypeNameContext(memberVariableDeclarations[i]->typeName()));
 	}
 
 	// Register the struct type
@@ -3294,3 +3294,37 @@ bool PredaPreCompileListener::ProcessImportDirective(const PredaParser::ImportDi
 	return true;
 }
 
+void PredaRealListener::enterEventDeclaration(PredaParser::EventDeclarationContext *ctx)
+{
+	printf("enter event declaration\n");
+	return;
+}
+
+void PredaRealListener::exitEventDeclaration(PredaParser::EventDeclarationContext *ctx)
+{
+	printf("exit event declaration\n");
+	return;
+}
+
+void PredaRealListener::DeclareEvent(PredaParser::EventDeclarationContext *ctx)
+{
+
+	// todo: 完善这里
+	std::string eventName = ctx->identifier()->getText();
+
+	// 检查是否已经定义过同名 event
+	if (!m_identifierHub.ValidateNewIdentifier(ctx->identifier()))
+		return;
+}
+
+void PredaRealListener::enterEventStatement(PredaParser::EventStatementContext *ctx)
+{
+	printf("enter event statement\n");
+	return;
+}
+
+void PredaRealListener::exitEventStatement(PredaParser::EventStatementContext *ctx)
+{
+	printf("exit event statement\n");
+	return;
+}

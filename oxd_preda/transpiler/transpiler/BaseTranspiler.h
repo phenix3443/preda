@@ -75,7 +75,7 @@ namespace transpiler {
 		FunctionContext();
 
 		void PushFunctionScope(ConcreteTypePtr type);
-		void PushAddtionalLocalScope(LocalScope::ScopeType scopeType, const char *debugName);
+		void PushAdditionalLocalScope(LocalScope::ScopeType scopeType, const char *debugName);
 		void PopScope();
 
 		bool IsInsideFunction();
