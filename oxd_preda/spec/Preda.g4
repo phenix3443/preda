@@ -77,7 +77,7 @@ accessSpecifier
   : (PublicKeyword | ExportKeyword);
 
 eventDeclaration
-  : EventKeyword identifier '(' functionParameterList ')' ;
+  : EventKeyword identifier '(' functionParameterList ')' ';' ;
 
 variableDeclaration
   : typeName identifier;
@@ -129,7 +129,7 @@ expressionStatement
   : expression ';' ;
 
 eventStatement
-  : EmitKeyword identifier '(' functionCallArguments ')';
+  : EmitKeyword identifier '(' functionCallArguments ')' ';';
 
 ifStatement
   : ifWithBlock elseIfWithBlock* elseWithBlock?;
