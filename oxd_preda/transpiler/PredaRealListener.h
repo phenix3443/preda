@@ -61,6 +61,7 @@ public:
 	std::vector<std::pair<PredaParser::StructDefinitionContext*, ConcreteTypePtr>> m_definedStructs;
 	std::vector<std::pair<PredaParser::EnumDefinitionContext*, ConcreteTypePtr>> m_definedEnums;
 	std::vector<ConcreteTypePtr> m_definedInterfaces;
+	std::vector<std::pair<PredaParser::EventDeclarationContext *, ConcreteTypePtr>> m_definedEvent;
 
 	ErrorPortal m_errorPortal;
 	IdentifierHub m_identifierHub;

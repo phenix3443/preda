@@ -3294,37 +3294,56 @@ bool PredaPreCompileListener::ProcessImportDirective(const PredaParser::ImportDi
 	return true;
 }
 
+void PredaRealListener::DeclareEvent(PredaParser::EventDeclarationContext *ctx)
+{
+	ConcreteTypePtr thisType = m_transpilerCtx.thisPtrStack.stack.back().thisType;
+
+	// TODO: global event definition is not supported yet, hence this should hold
+	assert(thisType != nullptr);
+
+	if (thisType == nullptr)
+		thisType = m_transpilerCtx.globalType;
+
+	std::string eventName = ctx->identifier()->getText();
+	{
+		if (0)
+		{
+			// TODO: not an overloaded event in the same scope
+			if (0 /**find same event**/)
+			{
+				m_errorPortal.SetAnchor(ctx->identifier()->start);
+				m_errorPortal.AddIdentifierRedefinitionError(eventName);
+				return;
+			}
+		}
+	}
+	m_definedEvent.push_back(std::make_pair(ctx, thisType));
+}
+
 void PredaRealListener::enterEventDeclaration(PredaParser::EventDeclarationContext *ctx)
 {
-	printf("enter event declaration\n");
-	return;
+	std::string eventName = ctx->identifier()->getText();
+	std::string codeOutput = "printf(\"enter" + eventName + " event declaration\\n\");\n";
+	codeSerializer.AddLine(codeOutput);
 }
 
 void PredaRealListener::exitEventDeclaration(PredaParser::EventDeclarationContext *ctx)
 {
+	// todo: 参照 exitFunctionDeclaration 完善这里
 	printf("exit event declaration\n");
 	return;
 }
 
-void PredaRealListener::DeclareEvent(PredaParser::EventDeclarationContext *ctx)
-{
-
-	// todo: 完善这里
-	std::string eventName = ctx->identifier()->getText();
-
-	// 检查是否已经定义过同名 event
-	if (!m_identifierHub.ValidateNewIdentifier(ctx->identifier()))
-		return;
-}
-
 void PredaRealListener::enterEventStatement(PredaParser::EventStatementContext *ctx)
 {
-	printf("enter event statement\n");
-	return;
+	std::string eventName = ctx->identifier()->getText();
+	std::string codeOutput = "printf(\"enter" + eventName + " event statement\\n\");\n";
+	codeSerializer.AddLine(codeOutput);
 }
 
 void PredaRealListener::exitEventStatement(PredaParser::EventStatementContext *ctx)
 {
+	// 这里可以不用实现，只是打印即可
 	printf("exit event statement\n");
 	return;
 }
