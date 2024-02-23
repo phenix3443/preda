@@ -22,3 +22,6 @@ oxd_preda/bin/solc/*
 !oxd_preda/bin/emscripten/3.1.24/.gitkeep
 preda-toolchain.exe
 .antlr
+bin/bin_release/
+oxd_libsec/lib/
+.vs
