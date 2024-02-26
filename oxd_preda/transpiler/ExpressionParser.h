@@ -38,10 +38,10 @@ private:
 	bool ParsePrimaryExpression(PredaParser::PrimaryExpressionContext *ctx, ExpressionResult &outResult, bool requireConst = false);
 	bool ParseExpression_Internal(PredaParser::ExpressionContext *ctx, ExpressionResult &outResult, bool requireConst = false);
 	bool ParseIdentifier_Internal(PredaParser::IdentifierContext *ctx, ExpressionResult &outResult, bool requireConst = false);
-	bool GenerateDebugPrintArguments(PredaParser::FunctionCallArgumentsContext *ctx, std::string &outSynthesizedArgumentsString);
 	bool ValidateExpressionResult(const ExpressionResult &result);
 
 public:
+	bool GenerateDebugPrintArguments(PredaParser::FunctionCallArgumentsContext *ctx, std::string &outSynthesizedArgumentsString);
 	void SetTranspilerContext(transpiler::PredaTranspilerContext *pCtx)
 	{
 		m_pTranspilerCtx = pCtx;

@@ -3337,7 +3337,13 @@ void PredaRealListener::exitEventDeclaration(PredaParser::EventDeclarationContex
 void PredaRealListener::enterEventStatement(PredaParser::EventStatementContext *ctx)
 {
 	std::string eventName = ctx->identifier()->getText();
-	std::string codeOutput = "printf(\"enter" + eventName + " event statement\\n\");\n";
+	std::string functionArgumentsSynthesizeResult;
+	ExpressionParser m_expressionParser;
+	m_expressionParser.GenerateDebugPrintArguments(ctx->functionCallArguments(), functionArgumentsSynthesizeResult);
+
+	std::ostringstream oss;
+	oss << "__prli__debug.__prli_print(" << functionArgumentsSynthesizeResult << ");";
+	std::string codeOutput = oss.str();
 	codeSerializer.AddLine(codeOutput);
 }
 
