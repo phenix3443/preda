@@ -1,0 +1,53 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "compile",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/bin/bin_debug/chsimu.exe",
+      "args": [
+        "-log",
+        "d:/PREDA/PREDA_Dev_Environment/examples/Event.prd",
+        "-stdout"
+      ],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}/bin/bin_debug/",
+      "environment": [],
+      "externalConsole": false,
+      "MIMode": "gdb",
+      "setupCommands": [
+        {
+          "description": "Enable pretty-printing for gdb",
+          "text": "-enable-pretty-printing",
+          "ignoreFailures": true
+        }
+      ],
+      "miDebuggerPath": "${workspaceFolder}/oxd_preda/bin/mingw64/bin/gdb.exe"
+    },
+    {
+      "name": "run",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/bin/bin_debug/chsimu.exe",
+      "args": [
+        "d:/PREDA/PREDA_Dev_Environment/examples/Event.prdts",
+        "-count:10",
+        "-stdout"
+      ],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}/bin/bin_debug/",
+      "environment": [],
+      "externalConsole": false,
+      "MIMode": "gdb",
+      "setupCommands": [
+        {
+          "description": "Enable pretty-printing for gdb",
+          "text": "-enable-pretty-printing",
+          "ignoreFailures": true
+        }
+      ],
+      "miDebuggerPath": "${workspaceFolder}/oxd_preda/bin/mingw64/bin/gdb.exe"
+    }
+  ]
+}
