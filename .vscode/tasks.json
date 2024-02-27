@@ -6,11 +6,15 @@
       "type": "shell",
       "command": "cmake",
       "args": [
-        "-S ./ ",
-        "-B ./build",
+        "-S",
+        "./",
+        "-B",
+        "./build",
         "-G",
         "\"Visual Studio 16 2019\"",
-        "-DDOWNLOAD_IPP=ON -DDOWNLOAD_3RDPARTY=ON -DBUNDLE_OPS=ON"
+        "-DDOWNLOAD_IPP=ON",
+        "-DDOWNLOAD_3RDPARTY=ON",
+        "-DBUNDLE_OPS=ON"
       ],
       "group": {
         "kind": "build",
@@ -23,7 +27,7 @@
       "label": "CMake Build Debug",
       "type": "shell",
       "command": "cmake",
-      "args": ["--build ./build", "--config Debug"],
+      "args": ["--build", "./build", "--config", "Debug"],
       "group": {
         "kind": "build",
         "isDefault": true

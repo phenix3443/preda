@@ -3337,19 +3337,13 @@ void PredaRealListener::exitEventDeclaration(PredaParser::EventDeclarationContex
 void PredaRealListener::enterEventStatement(PredaParser::EventStatementContext *ctx)
 {
 	std::string eventName = ctx->identifier()->getText();
-	std::string functionArgumentsSynthesizeResult;
-	ExpressionParser m_expressionParser;
-	m_expressionParser.GenerateDebugPrintArguments(ctx->functionCallArguments(), functionArgumentsSynthesizeResult);
-
+	std::string expRes;
+	if (!m_expressionParser.GenerateDebugPrintArguments(ctx->functionCallArguments(), expRes))
+	{
+		return;
+	}
 	std::ostringstream oss;
-	oss << "__prli__debug.__prli_print(" << functionArgumentsSynthesizeResult << ");";
+	oss << "__prli___debug.__prli_print(" << expRes << ");";
 	std::string codeOutput = oss.str();
 	codeSerializer.AddLine(codeOutput);
-}
-
-void PredaRealListener::exitEventStatement(PredaParser::EventStatementContext *ctx)
-{
-	// 这里可以不用实现，只是打印即可
-	printf("exit event statement\n");
-	return;
 }
