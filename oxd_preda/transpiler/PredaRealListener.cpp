@@ -3294,44 +3294,27 @@ bool PredaPreCompileListener::ProcessImportDirective(const PredaParser::ImportDi
 	return true;
 }
 
-void PredaRealListener::DeclareEvent(PredaParser::EventDeclarationContext *ctx)
+void PredaRealListener::enterEventDeclaration(PredaParser::EventDeclarationContext *ctx)
 {
 	ConcreteTypePtr thisType = m_transpilerCtx.thisPtrStack.stack.back().thisType;
-
-	// TODO: global event definition is not supported yet, hence this should hold
+	// global scope event definition is not supported yet by the PREDA grammar, hence this should hold
 	assert(thisType != nullptr);
 
 	if (thisType == nullptr)
 		thisType = m_transpilerCtx.globalType;
 
 	std::string eventName = ctx->identifier()->getText();
+	if (!m_identifierHub.ValidateNewIdentifier(ctx->identifier()))
 	{
-		if (0)
-		{
-			// TODO: not an overloaded event in the same scope
-			if (0 /**find same event**/)
-			{
-				m_errorPortal.SetAnchor(ctx->identifier()->start);
-				m_errorPortal.AddIdentifierRedefinitionError(eventName);
-				return;
-			}
-		}
+		return;
 	}
-	m_definedEvent.push_back(std::make_pair(ctx, thisType));
-}
-
-void PredaRealListener::enterEventDeclaration(PredaParser::EventDeclarationContext *ctx)
-{
-	std::string eventName = ctx->identifier()->getText();
-	std::string codeOutput = "printf(\"enter" + eventName + " event declaration\\n\");\n";
-	codeSerializer.AddLine(codeOutput);
-}
-
-void PredaRealListener::exitEventDeclaration(PredaParser::EventDeclarationContext *ctx)
-{
-	// todo: 参照 exitFunctionDeclaration 完善这里
-	printf("exit event declaration\n");
-	return;
+	if (std::find(m_definedEvents.begin(), m_definedEvents.end(), eventName) != m_definedEvents.end())
+	{
+		m_errorPortal.SetAnchor(ctx->identifier()->start);
+		m_errorPortal.AddIdentifierRedefinitionError(eventName);
+		return;
+	}
+	m_definedEvents.push_back(eventName);
 }
 
 void PredaRealListener::enterEventStatement(PredaParser::EventStatementContext *ctx)

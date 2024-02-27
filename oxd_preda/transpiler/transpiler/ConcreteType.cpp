@@ -196,6 +196,21 @@ namespace transpiler {
 		return structType;
 	}
 
+	ConcreteTypePtr ConcreteType::CreateInnerEventType(const std::string &typeName)
+	{
+		ConcreteTypePtr structType = Allocator::New<ConcreteType>(ReferenceType);
+		structType->bIsUserDefinedStructType = true;
+		structType->inputName = typeName;
+		structType->outputFullName = typeOutputPrefix + typeName; // User-defined struct names are kept the same in the output
+		structType->exportName = typeName;
+		structType->supportedOperatorMask = uint64_t(OperatorTypeBitMask::DotBit) | uint64_t(OperatorTypeBitMask::AssignmentBit);
+
+		if (!AttachInnerConcreteType(structType))
+			return nullptr;
+
+		return structType;
+	}
+
 	ConcreteTypePtr ConcreteType::CreateInnerEnumType(const std::string &typeName)
 	{
 		ConcreteTypePtr enumType = Allocator::New<ConcreteType>(EnumType);
