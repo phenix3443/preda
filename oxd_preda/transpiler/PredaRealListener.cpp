@@ -3304,7 +3304,7 @@ void PredaRealListener::DeclareEvent(PredaParser::EventDeclarationContext *ctx)
 	if (std::find(m_definedEvents.begin(), m_definedEvents.end(), eventName) != m_definedEvents.end())
 	{
 		m_errorPortal.SetAnchor(ctx->identifier()->start);
-		m_errorPortal.AddIdentifierRedefinitionError(eventName);
+		m_errorPortal.AddEventRedefinitionError(eventName);
 		return;
 	}
 	m_definedEvents.push_back(eventName);
@@ -3322,6 +3322,8 @@ void PredaRealListener::enterEventStatement(PredaParser::EventStatementContext *
 	std::string expRes;
 	if (!m_expressionParser.GenerateDebugPrintArguments(ctx->functionCallArguments(), expRes))
 	{
+		m_errorPortal.SetAnchor(ctx->identifier()->start);
+		m_errorPortal.AddEventCallMissingArgumentListError();
 		return;
 	}
 	std::ostringstream oss;

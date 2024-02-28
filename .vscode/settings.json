@@ -77,7 +77,14 @@
     "regex": "cpp",
     "__tuple": "cpp",
     "memory": "cpp",
-    "type_traits": "cpp"
+    "type_traits": "cpp",
+    "sparsetable": "cpp",
+    "hash_map": "cpp",
+    "hash_set": "cpp",
+    "forward_list": "cpp",
+    "rope": "cpp",
+    "slist": "cpp",
+    "valarray": "cpp"
   },
   "cSpell.words": [
     "contractfull",
