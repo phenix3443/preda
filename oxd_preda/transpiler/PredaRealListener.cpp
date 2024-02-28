@@ -2009,6 +2009,10 @@ void PredaRealListener::enterContractDefinition(PredaParser::ContractDefinitionC
 		{
 			DefineConstVariable(contractParts[i]->constVariableDeclaration());
 		}
+		else if (contractParts[i]->eventDeclaration())
+		{
+			DeclareEvent(contractParts[i]->eventDeclaration());
+		}
 	}
 
 	// Generate code for enum types
@@ -3290,7 +3294,7 @@ bool PredaPreCompileListener::ProcessImportDirective(const PredaParser::ImportDi
 	return true;
 }
 
-void PredaRealListener::enterEventDeclaration(PredaParser::EventDeclarationContext *ctx)
+void PredaRealListener::DeclareEvent(PredaParser::EventDeclarationContext *ctx)
 {
 	ConcreteTypePtr thisType = m_transpilerCtx.thisPtrStack.stack.back().thisType;
 	// global scope event definition is not supported yet by the PREDA grammar, hence this should hold
@@ -3311,6 +3315,12 @@ void PredaRealListener::enterEventDeclaration(PredaParser::EventDeclarationConte
 		return;
 	}
 	m_definedEvents.push_back(eventName);
+}
+
+void PredaRealListener::enterEventDeclaration(PredaParser::EventDeclarationContext *ctx)
+{
+	std::cout << "call enterEventDeclaration" << std::endl;
+	return;
 }
 
 void PredaRealListener::enterEventStatement(PredaParser::EventStatementContext *ctx)

@@ -228,6 +228,7 @@ private:
 	size_t ExportFunction(transpiler::FunctionRef functionRef);
 	void PropagateFunctionFlagAcrossCallingGraph();
 	void TraverseAllFunctions();
+	void DeclareEvent(PredaParser::EventDeclarationContext *ctx);
 
 public:
 	// interface inherited from PredaListener
