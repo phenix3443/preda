@@ -3296,13 +3296,6 @@ bool PredaPreCompileListener::ProcessImportDirective(const PredaParser::ImportDi
 
 void PredaRealListener::DeclareEvent(PredaParser::EventDeclarationContext *ctx)
 {
-	ConcreteTypePtr thisType = m_transpilerCtx.thisPtrStack.stack.back().thisType;
-	// global scope event definition is not supported yet by the PREDA grammar, hence this should hold
-	assert(thisType != nullptr);
-
-	if (thisType == nullptr)
-		thisType = m_transpilerCtx.globalType;
-
 	std::string eventName = ctx->identifier()->getText();
 	if (!m_identifierHub.ValidateNewIdentifier(ctx->identifier()))
 	{

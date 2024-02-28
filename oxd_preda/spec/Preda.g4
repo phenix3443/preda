@@ -60,7 +60,6 @@ enumDefinition
 
 functionDefinition
   : functionDeclaration '{' statement* '}' ;
-
 functionDeclaration
   : doxygen? annotation? scope? FunctionKeyword functionReturnTypeName? identifier '(' functionParameterList ')' accessSpecifier* ConstantKeyword? ;
 

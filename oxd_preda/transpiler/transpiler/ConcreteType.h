@@ -244,7 +244,6 @@ namespace transpiler {
 			SystemReservedType,
 			UnnamedScopeType,
 			AliasType,
-			EventType,
 		};
 
 		std::string inputName;																				// the name of this type to match the input source code, e.g. "string", "MyStruct", "array<map<uint, MyStruct>>"
@@ -284,8 +283,7 @@ namespace transpiler {
 		ConcreteTypePtr CreateInnerUserDefinedStructType(const std::string &typeName);
 		ConcreteTypePtr CreateInnerEnumType(const std::string &typeName);
 		ConcreteTypePtr CreateInnerAliasType(const std::string &typeName, ConcreteTypePtr realType);
-		ConcreteTypePtr CreateInnerInterfaceType(const std::string& typeName);
-		ConcreteTypePtr CreateInnerEventType(const std::string &typeName);
+		ConcreteTypePtr CreateInnerInterfaceType(const std::string &typeName);
 
 		bool IsConstTransitive()
 		{
