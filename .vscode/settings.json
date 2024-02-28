@@ -84,7 +84,8 @@
     "forward_list": "cpp",
     "rope": "cpp",
     "slist": "cpp",
-    "valarray": "cpp"
+    "valarray": "cpp",
+    "strstream": "cpp"
   },
   "cSpell.words": [
     "contractfull",

@@ -36,6 +36,18 @@
       "detail": "CMake build in Debug mode"
     },
     {
+      "label": "CMake Build Realease",
+      "type": "shell",
+      "command": "cmake",
+      "args": ["--build", "./build", "--config", "Release"],
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      },
+      "problemMatcher": [],
+      "detail": "CMake build in Debug mode"
+    },
+    {
       "label": "CMake Clean",
       "type": "shell",
       "command": "cmake",

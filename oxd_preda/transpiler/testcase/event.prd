@@ -1,0 +1,9 @@
+
+contract A {
+    event EchoName(string name);
+    event EchoNameAge(string name, uint16 age);
+    @address function call(string name, uint16 age) export{
+    //    emit EchoName(name);
+       emit EchoNameAge(name, age);
+    }
+}

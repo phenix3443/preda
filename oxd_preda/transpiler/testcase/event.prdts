@@ -1,0 +1,15 @@
+random.reseed
+allocate.address 1024
+chain.gaslimit 256
+
+chain.deploy @1 event.prd
+
+A.call @0 {name: "alice", age: 20}
+
+stopwatch.restart
+chain.run
+stopwatch.report
+
+chain.info
+
+viz.profiling
