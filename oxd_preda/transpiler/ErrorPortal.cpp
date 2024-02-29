@@ -173,7 +173,7 @@ void ErrorPortal::AddEmptyStructError()
 	AddError(ErrorCode::EmptyStruct, "empty struct type not allowed.");
 }
 
-void ErrorPortal::AddContractNameMistachError(const std::string &nameInCode, const std::string &nameInParam)
+void ErrorPortal::AddContractNameMismatchError(const std::string &nameInCode, const std::string &nameInParam)
 {
 	AddError(ErrorCode::ContractNameMismatch, "contract name in source code \"" + nameInCode + "\" differs from given name \"" + nameInParam + "\".");
 }

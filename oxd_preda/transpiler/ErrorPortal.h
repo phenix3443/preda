@@ -66,7 +66,7 @@ public:
 	void AddExportFunctionNameConflictError();
 	void AddRelayFunctionCannotBeTransactionOrPublicError();
 	void AddEmptyStructError();
-	void AddContractNameMistachError(const std::string &nameInCode, const std::string &nameInParam);
+	void AddContractNameMismatchError(const std::string &nameInCode, const std::string &nameInParam);
 	void AddNoReturnFromFunctionWithReturnTypeError();
 	void AddMinedDependencyWithRelayError();
 	void AddNoMatchingOverloadedFunctionError();
