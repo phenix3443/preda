@@ -88,13 +88,34 @@
     "strstream": "cpp"
   },
   "cSpell.words": [
+    "buildnum",
+    "ciid",
     "contractfull",
+    "Crockford",
+    "csid",
+    "cvid",
+    "dappname",
+    "Embeddable",
+    "Illeage",
+    "injson",
     "itor",
+    "Jsonify",
+    "LONGINTIMPLFUNC",
+    "LPCSTR",
+    "outjson",
+    "pftemp",
     "prli",
     "prlt",
+    "PROCPRIO",
     "Propagatable",
+    "Randomizer",
     "relaylambda",
     "scaleout",
-    "userblock"
+    "SECSUITE",
+    "ttmath",
+    "txns",
+    "uievent",
+    "userblock",
+    "webui"
   ]
 }

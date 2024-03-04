@@ -263,7 +263,7 @@ void CRuntimeInterface::PushContractStack(const rvm::ContractModuleID &moduleId,
 	ContractStackEntry entry;
 	entry.moduleId = moduleId;
 	entry.cvId = cvId;
-	entry.funtionFlags = functionFlags;
+	entry.functionFlags = functionFlags;
 	entry.importedCvIds = importedCvId;
 	entry.numImportedContracts = numImportedContracts;
 	m_contractStack.push_back(entry);

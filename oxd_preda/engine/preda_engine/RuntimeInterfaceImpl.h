@@ -35,7 +35,7 @@ private:
 		rvm::ContractVersionId cvId;
 		const rvm::ContractVersionId *importedCvIds;
 		uint32_t numImportedContracts;
-		uint32_t funtionFlags;
+		uint32_t functionFlags;
 	};
 	std::vector<ContractStackEntry> m_contractStack;
 	std::unordered_map<prlrt::CBigInt*, std::unique_ptr<prlrt::CBigInt>> m_bigint;
