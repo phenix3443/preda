@@ -116,6 +116,13 @@
     "txns",
     "uievent",
     "userblock",
+    "wasmtime",
     "webui"
-  ]
+  ],
+  "cmake.configureSettings": {
+    "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+    "DOWNLOAD_IPP": "ON",
+    "DOWNLOAD_3RDPARTY": "ON",
+    "BUNDLE_OPS": "ON"
+  }
 }

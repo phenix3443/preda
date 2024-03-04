@@ -2,7 +2,7 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "Set the compile parameters",
+      "label": "Cmake configure",
       "type": "shell",
       "command": "cmake",
       "args": [
@@ -14,7 +14,8 @@
         "\"Visual Studio 16 2019\"",
         "-DDOWNLOAD_IPP=ON",
         "-DDOWNLOAD_3RDPARTY=ON",
-        "-DBUNDLE_OPS=ON"
+        "-DBUNDLE_OPS=ON",
+        "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON"
       ],
       "group": {
         "kind": "build",
