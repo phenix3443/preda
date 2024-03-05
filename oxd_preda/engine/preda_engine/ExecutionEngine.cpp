@@ -43,10 +43,10 @@ void CExecutionEngine::ReleaseExecutionIntermediateData()
 	// do not report orphan token when destroying contract instances.
 	// contract instances are serialized after execution, hence also the tokens in them.
 	// The only exception is a const call. In this case serialization of the token shouldn't expected anyway.
-	m_runtimeInterface.TurnOhphanTokenReportOnOff(false);
+	m_runtimeInterface.TurnOrphanTokenReportOnOff(false);
 	for (auto itor : m_intermediateContractInstances)
 		itor.second->DestroyContractInstance();
-	m_runtimeInterface.TurnOhphanTokenReportOnOff(true);
+	m_runtimeInterface.TurnOrphanTokenReportOnOff(true);
 	m_intermediateContractInstances.clear();
 	m_runtimeInterface.ClearStateModifiedFlags();
 	m_runtimeInterface.ClearContractStack();
@@ -230,7 +230,7 @@ rvm::InvokeResult CExecutionEngine::Invoke(rvm::ExecutionContext *executionConte
 			ret.Code = rvm::InvokeErrorCode::ContractFunctionUnavailable;
 			return ret;
 		case prlrt::ExecutionError::ArgumentDeserializationFailure:
-			ret.Code = rvm::InvokeErrorCode::InvalidFunctionArgments;
+			ret.Code = rvm::InvokeErrorCode::InvalidFunctionArguments;
 			return ret;
 		case prlrt::ExecutionError::RuntimeException:
 		{

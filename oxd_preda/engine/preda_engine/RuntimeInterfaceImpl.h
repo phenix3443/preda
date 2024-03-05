@@ -97,7 +97,7 @@ public:
 	{
 		m_contractStack.clear();
 	}
-	void TurnOhphanTokenReportOnOff(bool bOn)
+	void TurnOrphanTokenReportOnOff(bool bOn)
 	{
 		m_bReportOrphanToken = bOn;
 	}

@@ -987,7 +987,7 @@ namespace preda_evm {
         case EVMC_REJECTED:
             return rvm::InvokeErrorCode::InternalError;
         case EVMC_ARGUMENT_OUT_OF_RANGE:
-            return rvm::InvokeErrorCode::InvalidFunctionArgments;
+            return rvm::InvokeErrorCode::InvalidFunctionArguments;
         case EVMC_OUT_OF_MEMORY:
             return rvm::InvokeErrorCode::OutOfMemory;
         case EVMC_INSUFFICIENT_BALANCE:
@@ -1034,8 +1034,8 @@ namespace preda_evm {
         std::string data(dataTmp.Begin(), dataTmp.GetLength());
         if(data.empty() && !ParseSolArgument(args_json, entry->compileData, value, data, opCode))
 		{
-            ret.Code = rvm::InvokeErrorCode::InvalidFunctionArgments;
-			return ret;
+            ret.Code = rvm::InvokeErrorCode::InvalidFunctionArguments;
+            return ret;
 		}
 
         if(opCode == rvm::OpCode(0))
@@ -1061,8 +1061,8 @@ namespace preda_evm {
             rt::String data_binary;
 			if (!os::Base16Decode(data, data_binary))
 			{
-                ret.Code = rvm::InvokeErrorCode::InvalidFunctionArgments;
-				return ret;
+                ret.Code = rvm::InvokeErrorCode::InvalidFunctionArguments;
+                return ret;
 			}
 
             host.get_stack_back().balances[origin] = TTMathUintToEVMCUint(EVMCUintToTTMathUint(current_balance) - TTMathUint256(gas_limit) * TTMathUint256(GAS_PRICE));
@@ -1088,7 +1088,7 @@ namespace preda_evm {
         }
         else
         {
-            ret.Code = rvm::InvokeErrorCode::InvalidFunctionArgments;
+            ret.Code = rvm::InvokeErrorCode::InvalidFunctionArguments;
             return ret;
         }
 	}
