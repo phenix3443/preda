@@ -11,11 +11,10 @@
         "-B",
         "./build",
         "-G",
-        "\"Visual Studio 16 2019\"",
+        "'Visual Studio 16 2019'",
         "-DDOWNLOAD_IPP=ON",
         "-DDOWNLOAD_3RDPARTY=ON",
-        "-DBUNDLE_OPS=ON",
-        "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON"
+        "-DBUNDLE_OPS=ON"
       ],
       "group": {
         "kind": "build",
