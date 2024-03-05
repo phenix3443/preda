@@ -24,3 +24,4 @@ preda-toolchain.exe
 bin/
 oxd_libsec/lib/
 .vs
+.cache/
