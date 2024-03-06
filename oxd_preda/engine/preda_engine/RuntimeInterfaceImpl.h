@@ -50,6 +50,7 @@ private:
 	uint32_t m_remainingGas = 0;
 
 	std::string m_logOutputBuffer;
+	std::string m_eventBuffer;
 	std::stack<prlrt::ExceptionType> exec_stack;
 	prlrt::ExceptionType* curr_exc = nullptr;
 

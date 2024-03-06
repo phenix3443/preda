@@ -229,6 +229,7 @@ private:
 	void PropagateFunctionFlagAcrossCallingGraph();
 	void TraverseAllFunctions();
  	void DeclareEvent(PredaParser::EventDeclarationContext *ctx);
+	bool GenerateEventNotifyArguments(PredaParser::EventStatementContext *ctx, std::string &outSynthesizedArgumentsString);
 
 public:
 	// interface inherited from PredaListener

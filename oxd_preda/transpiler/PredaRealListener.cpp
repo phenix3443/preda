@@ -3318,16 +3318,38 @@ void PredaRealListener::enterEventDeclaration(PredaParser::EventDeclarationConte
 
 void PredaRealListener::enterEventStatement(PredaParser::EventStatementContext *ctx)
 {
-	std::string eventName = ctx->identifier()->getText();
 	std::string expRes;
-	if (!m_expressionParser.GenerateDebugPrintArguments(ctx->functionCallArguments(), expRes))
+	if (!GenerateEventNotifyArguments(ctx, expRes))
 	{
 		m_errorPortal.SetAnchor(ctx->identifier()->start);
 		m_errorPortal.AddEventCallMissingArgumentListError();
 		return;
 	}
 	std::ostringstream oss;
-	oss << "__prli___debug.__prli_print(" << expRes << ");";
+	oss << "__prli___event.__prli_emit(" << expRes << ");";
 	std::string codeOutput = oss.str();
 	codeSerializer.AddLine(codeOutput);
+}
+
+bool PredaRealListener::GenerateEventNotifyArguments(PredaParser::EventStatementContext *ctx, std::string &outSynthesizedArgumentsString)
+{
+	std::string eventName = ctx->identifier()->getText();
+	std::vector<PredaParser::ExpressionContext *> argCtxs = ctx->functionCallArguments()->expression();
+
+	std::stringstream ss;
+	ss << std::quoted(eventName);
+
+	for (size_t i = 0; i < argCtxs.size(); i++)
+	{
+		ExpressionParser::ExpressionResult arg;
+		if (!m_expressionParser.ParseExpression(argCtxs[i], arg))
+			return false;
+
+		// skip arguments that are of void type
+		if (arg.type.baseConcreteType == nullptr)
+			continue;
+		ss << "," << std::quoted(arg.type.baseConcreteType->exportName) << "," << arg.text;
+	}
+	outSynthesizedArgumentsString = ss.str();
+	return true;
 }
