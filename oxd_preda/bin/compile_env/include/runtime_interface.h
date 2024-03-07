@@ -267,8 +267,7 @@ namespace prlrt {
 	V(void, Event_Notify, uint32_t id, const char* pData, uint32_t dataLen)\
 	V(void, Event_Exception, const char *msg, ::prlrt::ExceptionType exc_type)\
 	V(void, EventEmit, const char* eventName, size_t nameLen)\
-	V(void, EventEmitBufferAppendSerializedData, const char* type_export_name, const uint8_t* serialized_data, uint32_t serialized_data_size)\
-	V(void, Event_Exception, const char *msg, ::prlrt::ExceptionType exc_type)
+	V(void, EventEmitBufferAppendSerializedData, const char* type_export_name, const uint8_t* serialized_data, uint32_t serialized_data_size)
 
 #if defined(__wasm32__)
 #define PREDA_INTERFACE_METHOD_V(RET, FN, ...) RET preda##FN(__VA_ARGS__);

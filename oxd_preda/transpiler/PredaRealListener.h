@@ -262,6 +262,5 @@ public:
 	virtual void enterPredaSource(PredaParser::PredaSourceContext * /*ctx*/) override;
   	//virtual void enterDoxygen(PredaParser::DoxygenContext * /*ctx*/) override;
 
-	virtual void enterEventDeclaration(PredaParser::EventDeclarationContext *ctx) override;
 	virtual void enterEventStatement(PredaParser::EventStatementContext *ctx) override;
 };
