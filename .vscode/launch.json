@@ -5,14 +5,14 @@
       "name": "compile event contract",
       "type": "cppvsdbg",
       "request": "launch",
-      "program": "${workspaceFolder}/bin/bin_debug/chsimu.exe",
+      "program": "${workspaceFolder}/oxd_preda/bin/bin_debug/chsimu.exe",
       "args": [
         "-log",
         "${workspaceFolder}/oxd_preda/transpiler/testcase/event.prd",
         "-stdout"
       ],
       "stopAtEntry": false,
-      "cwd": "${workspaceFolder}/bin/bin_debug/",
+      "cwd": "${workspaceFolder}/oxd_preda/bin/bin_debug/",
       "environment": [],
       "console": "internalConsole"
     },
@@ -27,7 +27,7 @@
         "-stdout"
       ],
       "stopAtEntry": false,
-      "cwd": "${workspaceFolder}/bin/bin_debug/",
+      "cwd": "${workspaceFolder}/oxd_preda/bin/bin_debug/",
       "environment": [],
       "console": "internalConsole"
     }

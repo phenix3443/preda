@@ -21,7 +21,10 @@
         "isDefault": true
       },
       "problemMatcher": [],
-      "detail": "Set the compile parameters"
+      "detail": "Set the compile parameters",
+      "options": {
+        "cwd": "${workspaceFolder}/oxd_preda"
+      }
     },
     {
       "label": "CMake Build Debug",
@@ -33,7 +36,10 @@
         "isDefault": true
       },
       "problemMatcher": [],
-      "detail": "CMake build in Debug mode"
+      "detail": "CMake build in Debug mode",
+      "options": {
+        "cwd": "${workspaceFolder}/oxd_preda"
+      }
     },
     {
       "label": "CMake Build Realease",
