@@ -92,9 +92,9 @@ namespace prlrt {
 	};
 
 	template<int Size>
-	struct LongIntInternal {
+	struct LongIntInternal{
 		static const bool __IsPOD = true;
-		uint8_t _Data[Size / 8];
+		uint8_t _Data[Size/8];
 		constexpr LongIntInternal<Size>() : _Data()
 		{
 			for (int i = 0; i < Size / 8; i++)
@@ -272,18 +272,18 @@ namespace prlrt {
 
 #if defined(__wasm32__)
 #define PREDA_INTERFACE_METHOD_V(RET, FN, ...) RET preda##FN(__VA_ARGS__);
-	struct IRuntimeInterface {};
-	using BigintPtr = uint64_t;
-	extern "C" {
-		FOR_EACH_PREDA_INTERFACE_METHOD(PREDA_INTERFACE_METHOD_V)
-	}
+struct IRuntimeInterface {};
+using BigintPtr = uint64_t;
+extern "C" {
+	FOR_EACH_PREDA_INTERFACE_METHOD(PREDA_INTERFACE_METHOD_V)
+}
 #undef PREDA_INTERFACE_METHOD_V
 #else
 #define PREDA_INTERFACE_METHOD_V(RET, FN, ...) virtual RET FN(__VA_ARGS__) = 0;
-	using BigintPtr = prlrt::CBigInt*;
-	struct IRuntimeInterface {
-		FOR_EACH_PREDA_INTERFACE_METHOD(PREDA_INTERFACE_METHOD_V)
-	};
+using BigintPtr = prlrt::CBigInt*;
+struct IRuntimeInterface {
+	FOR_EACH_PREDA_INTERFACE_METHOD(PREDA_INTERFACE_METHOD_V)
+};
 #undef PREDA_INTERFACE_METHOD_V
 #endif
 }
