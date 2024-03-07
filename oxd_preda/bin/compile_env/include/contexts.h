@@ -138,6 +138,20 @@ namespace prlrt {
 		{
 			PREDA_CALL(Event_Notify, id._v, data.ptr->str.c_str(), (uint16_t)data.ptr->str.length());
 		}
+
+		void __prli_emit(std::string eventName)
+		{
+			PREDA_CALL(Event_Emit, eventName.c_str(), eventName.length());
+		}
+
+		template <typename TFirstArg, typename... Args>
+		void __prli_emit(std::string eventName, const char *typeExportName, TFirstArg &&first_arg, Args &&...args)
+		{
+			std::vector<uint8_t> buffer(first_arg.get_serialize_size());
+			first_arg.serialize_out(&buffer[0], true);
+			PREDA_CALL(EventEmitBufferAppendSerializedData, typeExportName, &buffer[0], (uint32_t)buffer.size());
+			__prli_emit(eventName, args...);
+		}
 	};
 
 }
