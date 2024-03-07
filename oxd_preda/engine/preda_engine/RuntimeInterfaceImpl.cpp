@@ -901,7 +901,7 @@ void CRuntimeInterface::EventEmitBufferAppendSerializedData(const char *type_exp
 	m_eventBuffer += outputStr;
 }
 
-void CRuntimeInterface::Event_Emit(const char *eventName, size_t nameLen)
+void CRuntimeInterface::EventEmit(const char *eventName, size_t nameLen)
 {
 	std::string tmp = std::string(eventName, nameLen) + " emitted: " + m_eventBuffer;
 	rvm::ConstString s{tmp.c_str(), uint32_t(tmp.size())};

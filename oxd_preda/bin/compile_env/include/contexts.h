@@ -141,7 +141,7 @@ namespace prlrt {
 
 		void __prli_emit(std::string eventName)
 		{
-			PREDA_CALL(Event_Emit, eventName.c_str(), eventName.length());
+			PREDA_CALL(EventEmit, eventName.c_str(), eventName.length());
 		}
 
 		template <typename TFirstArg, typename... Args>

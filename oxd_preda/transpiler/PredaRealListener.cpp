@@ -3310,12 +3310,6 @@ void PredaRealListener::DeclareEvent(PredaParser::EventDeclarationContext *ctx)
 	m_definedEvents.push_back(eventName);
 }
 
-void PredaRealListener::enterEventDeclaration(PredaParser::EventDeclarationContext *ctx)
-{
-	std::cout << "call enterEventDeclaration" << std::endl;
-	return;
-}
-
 void PredaRealListener::enterEventStatement(PredaParser::EventStatementContext *ctx)
 {
 	std::string expRes;

@@ -5,6 +5,7 @@ output/*
 *.pkg
 !**/.gitkeep
 **/.xmake
+**/.vscode
 **/.DS_Store
 *.msi
 *.wixobj
@@ -20,8 +21,8 @@ oxd_preda/bin/solc/*
 !oxd_preda/bin/solc/.gitkeep
 !oxd_preda/bin/emscripten/3.1.24/.gitkeep
 preda-toolchain.exe
-oxd_preda/bin/bin_debug
-oxd_preda/bin/bin_release
+bin_debug/
+bin_release/
 .antlr
 oxd_libsec/lib/
 .vs
