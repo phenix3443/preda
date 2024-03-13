@@ -257,6 +257,7 @@ namespace transpiler {
 		std::vector<DefinedIdentifierPtr> members;
 		std::vector<bool> vbMemberIsStatic;
 		std::vector<FunctionSignature> vOverloadedFunctions;												// the list of functions overloaded under the name of this variable
+
 		std::vector<std::pair<DefinedIdentifierPtr, size_t>> vInterfaceMemberFuncIndexMapping;				// for interface types, this maps the function index to the corresponding member and overload index
 		ConcreteTypePtr outerType;																			// outer type
 		std::map<std::string, ConcreteTypePtr> innerConcreteTypes;											// inner concrete types defined under this type
@@ -291,4 +292,33 @@ namespace transpiler {
 		}
 	};
 
+	struct EventSignature
+	{
+		std::vector<DefinedIdentifierPtr> parameters;
+		std::string doxygenComment;
+
+		EventSignature()
+		{
+		}
+
+		EventSignature(const std::vector<DefinedIdentifierPtr> &inParameters)
+		{
+			parameters = inParameters;
+		}
+
+		bool operator==(const EventSignature &other) const
+		{
+			// Only compare parameter list
+			if (parameters.size() != other.parameters.size())
+				return false;
+			for (size_t i = 0; i < parameters.size(); i++)
+			{
+				// only compare type, ignore the const-qualifier
+				if (parameters[i]->qualifiedType.baseConcreteType != other.parameters[i]->qualifiedType.baseConcreteType)
+					return false;
+			}
+
+			return true;
+		}
+	};
 }

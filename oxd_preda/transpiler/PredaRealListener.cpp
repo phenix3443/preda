@@ -3347,3 +3347,93 @@ bool PredaRealListener::GenerateEventNotifyArguments(PredaParser::EventStatement
 	outSynthesizedArgumentsString = ss.str();
 	return true;
 }
+
+int PredaRealListener::FindMatchingOverloadedEvent(PredaParser::EventStatementContext *ctx, std::string &outSynthesizedArgumentsString)
+{
+	std::string eventName = ctx->identifier()->getText();
+	std::vector<PredaParser::ExpressionContext *> argCtxs = ctx->functionCallArguments()->expression();
+
+	std::stringstream outSynthesizedArgumentsString;
+
+	for (size_t i = 0; i < argCtxs.size(); i++)
+	{
+		ExpressionParser::ExpressionResult arg;
+		if (!m_expressionParser.ParseExpression(argCtxs[i], arg))
+			return -1;
+
+		if (i > 0)
+			outSynthesizedArgumentsString << ", ";
+		outSynthesizedArgumentsString << args[i].text;
+	}
+
+	assert(calledEvent->vOverloadedFunctions.size() > 0);
+
+	bool bFunctionIsOverloaded = (calledEvent->vOverloadedFunctions.size() > 1);
+
+	for (size_t i = 0; i < calledEvent->vOverloadedFunctions.size(); i++)
+	{
+		const transpiler::FunctionSignature &functionSignature = calledEvent->vOverloadedFunctions[i];
+		if (functionSignature.parameters.size() != argCtxs.size())
+		{
+			// When there's no function overload, we provide a detailed error, otherwise skip to the next overloaded version
+			if (!bFunctionIsOverloaded)
+			{
+				m_pErrorPortal->SetAnchor(ctx->start);
+				m_pErrorPortal->AddArgumentListLengthMismatchError(functionSignature.parameters.size(), argCtxs.size());
+				return -1;
+			}
+			else
+				continue;
+		}
+
+		bool parameterListMatch = true;
+
+		for (size_t j = 0; j < argCtxs.size(); j++)
+		{
+			if (args[j].type.baseConcreteType != functionSignature.parameters[j]->qualifiedType.baseConcreteType)
+			{
+				if (!bFunctionIsOverloaded)
+				{
+					m_pErrorPortal->SetAnchor(argCtxs[j]->start);
+					m_pErrorPortal->AddTypeMismatchError(functionSignature.parameters[j]->qualifiedType.baseConcreteType, args[j].type.baseConcreteType);
+					return -1;
+				}
+				else
+				{
+					parameterListMatch = false;
+					break;
+				}
+			}
+
+			if (args[j].type.bIsConst && !functionSignature.parameters[j]->qualifiedType.bIsConst && args[j].type.baseConcreteType->IsConstTransitive())
+			{
+				if (!bFunctionIsOverloaded)
+				{
+					m_pErrorPortal->SetAnchor(argCtxs[j]->start);
+					m_pErrorPortal->AddAssignConstReferenceTypeToNonConstError(args[j].type.baseConcreteType);
+					return -1;
+				}
+				else
+				{
+					parameterListMatch = false;
+					break;
+				}
+			}
+		}
+
+		if (parameterListMatch)
+		{
+			if ((functionSignature.flags & uint32_t(transpiler::FunctionFlags::CallableFromSystem)) != 0)
+			{
+				m_pErrorPortal->SetAnchor(ctx->start);
+				m_pErrorPortal->AddCallSystemReservedFunctionError();
+				return -1;
+			}
+			return int(i);
+		}
+	}
+
+	m_pErrorPortal->SetAnchor(ctx->start);
+	m_pErrorPortal->AddNoMatchingOverloadedFunctionError();
+	return -1;
+}

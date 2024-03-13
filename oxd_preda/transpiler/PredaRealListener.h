@@ -26,7 +26,7 @@ class PredaPreCompileListener : public PredaBaseListener {
 			m_currentDAppName = dAppName;
 		}
 
-		std::vector<std::string> m_dependentContracts;
+		std::vector < std::pair<std::string, std::vector<transpiler::EventSignature>> m_dependentContracts;
 };
 
 class PredaRealListener : public PredaBaseListener, public antlr4::BaseErrorListener {
