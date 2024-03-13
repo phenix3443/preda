@@ -61,7 +61,7 @@ public:
 	std::vector<std::pair<PredaParser::StructDefinitionContext*, ConcreteTypePtr>> m_definedStructs;
 	std::vector<std::pair<PredaParser::EnumDefinitionContext*, ConcreteTypePtr>> m_definedEnums;
 	std::vector<ConcreteTypePtr> m_definedInterfaces;
-    std::vector<std::string> m_definedEvents;
+	std::map<PredaParser::EventDeclarationContext *, std::vector<transpiler::EventSignature>> m_definedEvents;
 
 	ErrorPortal m_errorPortal;
 	IdentifierHub m_identifierHub;
@@ -224,6 +224,8 @@ private:
 	void TraverseAllFunctions();
 	void DeclareEvent(PredaParser::EventDeclarationContext *ctx);
 	bool GenerateEventNotifyArguments(PredaParser::EventStatementContext *ctx, std::string &outSynthesizedArgumentsString);
+	bool GenEventSignatureFromEventDeclareCtx(transpiler::EventSignature &outSig, PredaParser::EventDeclarationContext *declCtx);
+	int FindMatchingOverloadedEvent(PredaParser::EventStatementContext *ctx, std::string &outSynthesizedArgumentsString);
 
 public:
 	// interface inherited from PredaListener

@@ -3307,7 +3307,16 @@ void PredaRealListener::DeclareEvent(PredaParser::EventDeclarationContext *ctx)
 		m_errorPortal.AddEventRedefinitionError(eventName);
 		return;
 	}
-	m_definedEvents.push_back(eventName);
+	// if (m_definedEvents.find(ctx) == m_definedEvents.end())
+	// {
+	// 	m_definedEvents[ctx] = std::vector<transpiler::EventSignature>();
+	// }
+
+	transpiler::EventSignature signature;
+	if (!GenEventSignatureFromEventDeclareCtx(signature, ctx))
+		return;
+
+	m_definedEvents[ctx].push_back(signature);
 }
 
 void PredaRealListener::enterEventStatement(PredaParser::EventStatementContext *ctx)
@@ -3352,34 +3361,34 @@ int PredaRealListener::FindMatchingOverloadedEvent(PredaParser::EventStatementCo
 {
 	std::string eventName = ctx->identifier()->getText();
 	std::vector<PredaParser::ExpressionContext *> argCtxs = ctx->functionCallArguments()->expression();
-
-	std::stringstream outSynthesizedArgumentsString;
+	std::vector<ExpressionParser::ExpressionResult> args(argCtxs.size());
+	std::stringstream ss;
 
 	for (size_t i = 0; i < argCtxs.size(); i++)
 	{
 		ExpressionParser::ExpressionResult arg;
-		if (!m_expressionParser.ParseExpression(argCtxs[i], arg))
+		if (!m_expressionParser.ParseExpression(argCtxs[i], args[i]))
 			return -1;
 
 		if (i > 0)
-			outSynthesizedArgumentsString << ", ";
-		outSynthesizedArgumentsString << args[i].text;
+			ss << ", ";
+		ss << arg.text;
 	}
 
-	assert(calledEvent->vOverloadedFunctions.size() > 0);
+	assert(m_definedEvents[ctx].size() > 0);
 
-	bool bFunctionIsOverloaded = (calledEvent->vOverloadedFunctions.size() > 1);
+	bool bFunctionIsOverloaded = (m_definedEvents[ctx].size() > 1);
 
-	for (size_t i = 0; i < calledEvent->vOverloadedFunctions.size(); i++)
+	for (size_t i = 0; i < m_definedEvents[ctx].size(); i++)
 	{
-		const transpiler::FunctionSignature &functionSignature = calledEvent->vOverloadedFunctions[i];
-		if (functionSignature.parameters.size() != argCtxs.size())
+		const transpiler::FunctionSignature &eventSignature = m_definedEvents[ctx];
+		if (eventSignature.parameters.size() != argCtxs.size())
 		{
 			// When there's no function overload, we provide a detailed error, otherwise skip to the next overloaded version
 			if (!bFunctionIsOverloaded)
 			{
-				m_pErrorPortal->SetAnchor(ctx->start);
-				m_pErrorPortal->AddArgumentListLengthMismatchError(functionSignature.parameters.size(), argCtxs.size());
+				m_errorPortal.SetAnchor(ctx->start);
+				m_errorPortal.AddArgumentListLengthMismatchError(eventSignature.parameters.size(), argCtxs.size());
 				return -1;
 			}
 			else
@@ -3390,12 +3399,12 @@ int PredaRealListener::FindMatchingOverloadedEvent(PredaParser::EventStatementCo
 
 		for (size_t j = 0; j < argCtxs.size(); j++)
 		{
-			if (args[j].type.baseConcreteType != functionSignature.parameters[j]->qualifiedType.baseConcreteType)
+			if (args[j].type.baseConcreteType != eventSignature.parameters[j]->qualifiedType.baseConcreteType)
 			{
 				if (!bFunctionIsOverloaded)
 				{
-					m_pErrorPortal->SetAnchor(argCtxs[j]->start);
-					m_pErrorPortal->AddTypeMismatchError(functionSignature.parameters[j]->qualifiedType.baseConcreteType, args[j].type.baseConcreteType);
+					m_errorPortal.SetAnchor(argCtxs[j]->start);
+					m_errorPortal.AddTypeMismatchError(eventSignature.parameters[j]->qualifiedType.baseConcreteType, args[j].type.baseConcreteType);
 					return -1;
 				}
 				else
@@ -3405,12 +3414,12 @@ int PredaRealListener::FindMatchingOverloadedEvent(PredaParser::EventStatementCo
 				}
 			}
 
-			if (args[j].type.bIsConst && !functionSignature.parameters[j]->qualifiedType.bIsConst && args[j].type.baseConcreteType->IsConstTransitive())
+			if (args[j].type.bIsConst && !eventSignature.parameters[j]->qualifiedType.bIsConst && args[j].type.baseConcreteType->IsConstTransitive())
 			{
 				if (!bFunctionIsOverloaded)
 				{
-					m_pErrorPortal->SetAnchor(argCtxs[j]->start);
-					m_pErrorPortal->AddAssignConstReferenceTypeToNonConstError(args[j].type.baseConcreteType);
+					m_errorPortal.SetAnchor(argCtxs[j]->start);
+					m_errorPortal.AddAssignConstReferenceTypeToNonConstError(args[j].type.baseConcreteType);
 					return -1;
 				}
 				else
@@ -3423,17 +3432,42 @@ int PredaRealListener::FindMatchingOverloadedEvent(PredaParser::EventStatementCo
 
 		if (parameterListMatch)
 		{
-			if ((functionSignature.flags & uint32_t(transpiler::FunctionFlags::CallableFromSystem)) != 0)
+			if ((eventSignature.flags & uint32_t(transpiler::FunctionFlags::CallableFromSystem)) != 0)
 			{
-				m_pErrorPortal->SetAnchor(ctx->start);
-				m_pErrorPortal->AddCallSystemReservedFunctionError();
+				m_errorPortal.SetAnchor(ctx->start);
+				m_errorPortal.AddCallSystemReservedFunctionError();
 				return -1;
 			}
 			return int(i);
 		}
 	}
 
-	m_pErrorPortal->SetAnchor(ctx->start);
-	m_pErrorPortal->AddNoMatchingOverloadedFunctionError();
+	m_errorPortal.SetAnchor(ctx->start);
+	m_errorPortal.AddNoMatchingOverloadedFunctionError();
 	return -1;
+}
+
+bool PredaRealListener::GenEventSignatureFromEventDeclareCtx(transpiler::EventSignature &outSig, PredaParser::EventDeclarationContext *declCtx)
+{
+	if (!declCtx)
+		return false;
+
+	std::string eventName = declCtx->identifier()->getText();
+	// parameters
+	std::vector<PredaParser::FunctionParameterContext *> vParamCtx = declCtx->functionParameterList()->functionParameter();
+	for (size_t i = 0; i < vParamCtx.size(); i++)
+	{
+		// function parameters are defined in the current scope (function scope)
+		bool bIsConst = (vParamCtx[i]->ConstantKeyword() != nullptr);
+		ConcreteTypePtr pType = m_identifierHub.GetTypeFromTypeNameContext(vParamCtx[i]->typeName());
+		if (pType == nullptr)
+			return false;
+
+		transpiler::DefinedIdentifierPtr pDefinedVariable = DefineFunctionLocalVariable(pType, vParamCtx[i]->identifier(), bIsConst, 0);
+		if (pDefinedVariable == nullptr)
+			return false;
+	}
+	outSig.parameters = m_transpilerCtx.functionCtx.localScopes.back().concreteType->members;
+
+	return true;
 }
