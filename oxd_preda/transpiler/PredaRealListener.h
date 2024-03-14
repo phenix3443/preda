@@ -225,7 +225,8 @@ private:
 	void DeclareEvent(PredaParser::EventDeclarationContext *ctx);
 	bool GenerateEventNotifyArguments(PredaParser::EventStatementContext *ctx, std::string &outSynthesizedArgumentsString);
 	bool GenEventSignatureFromEventDeclareCtx(transpiler::EventSignature &outSig, PredaParser::EventDeclarationContext *declCtx);
-	int FindMatchingOverloadedEvent(PredaParser::EventStatementContext *ctx, std::string &outSynthesizedArgumentsString);
+	bool GenEventSignatureFromEventStatementCtx(transpiler::EventSignature &outSig, PredaParser::EventStatementContext *ctx);
+	int FindMatchingOverloadedEvent(std::string eventName, std::string &outSynthesizedArgumentsString);
 
 public:
 	// interface inherited from PredaListener

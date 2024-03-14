@@ -3307,6 +3307,14 @@ void PredaRealListener::DeclareEvent(PredaParser::EventDeclarationContext *ctx)
 		m_errorPortal.AddEventRedefinitionError(eventName);
 		return;
 	}
+	std::string eventOutSynthesizedArgumentsString;
+	int index = FindMatchingOverloadedEvent(ctx, eventOutSynthesizedArgumentsString);
+	if (index != -1)
+	{
+		m_errorPortal.SetAnchor(ctx->identifier()->start);
+		m_errorPortal.AddEventRedefinitionError(eventName, index);
+		return;
+	}
 	// if (m_definedEvents.find(ctx) == m_definedEvents.end())
 	// {
 	// 	m_definedEvents[ctx] = std::vector<transpiler::EventSignature>();
@@ -3357,9 +3365,8 @@ bool PredaRealListener::GenerateEventNotifyArguments(PredaParser::EventStatement
 	return true;
 }
 
-int PredaRealListener::FindMatchingOverloadedEvent(PredaParser::EventStatementContext *ctx, std::string &outSynthesizedArgumentsString)
+int PredaRealListener::FindMatchingOverloadedEvent(std::string eventName, std::string &outSynthesizedArgumentsString)
 {
-	std::string eventName = ctx->identifier()->getText();
 	std::vector<PredaParser::ExpressionContext *> argCtxs = ctx->functionCallArguments()->expression();
 	std::vector<ExpressionParser::ExpressionResult> args(argCtxs.size());
 	std::stringstream ss;
@@ -3457,17 +3464,46 @@ bool PredaRealListener::GenEventSignatureFromEventDeclareCtx(transpiler::EventSi
 	std::vector<PredaParser::FunctionParameterContext *> vParamCtx = declCtx->functionParameterList()->functionParameter();
 	for (size_t i = 0; i < vParamCtx.size(); i++)
 	{
-		// function parameters are defined in the current scope (function scope)
-		bool bIsConst = (vParamCtx[i]->ConstantKeyword() != nullptr);
 		ConcreteTypePtr pType = m_identifierHub.GetTypeFromTypeNameContext(vParamCtx[i]->typeName());
 		if (pType == nullptr)
 			return false;
 
-		transpiler::DefinedIdentifierPtr pDefinedVariable = DefineFunctionLocalVariable(pType, vParamCtx[i]->identifier(), bIsConst, 0);
+		transpiler::DefinedIdentifierPtr pDefinedVariable = DefineFunctionLocalVariable(pType, vParamCtx[i]->identifier(), true, 0);
 		if (pDefinedVariable == nullptr)
 			return false;
 	}
 	outSig.parameters = m_transpilerCtx.functionCtx.localScopes.back().concreteType->members;
+
+	return true;
+}
+
+bool PredaRealListener::GenEventSignatureFromEventStatementCtx(transpiler::EventSignature &outSig, PredaParser::EventStatementContext *ctx)
+{
+	// if (!ctx)
+	// 	return false;
+
+	// std::string eventName = ctx->identifier()->getText();
+	// std::vector<PredaParser::ExpressionContext *> argCtxs = ctx->functionCallArguments()->expression();
+
+	// std::stringstream ss;
+	// ss << std::quoted(eventName);
+
+	// for (size_t i = 0; i < argCtxs.size(); i++)
+	// {
+	// 	// function parameters are defined in the current scope (function scope)
+	// 	ExpressionParser::ExpressionResult arg;
+	// 	if (!m_expressionParser.ParseExpression(argCtxs[i], arg))
+	// 		return false;
+
+	// 	// skip arguments that are of void type
+	// 	if (arg.type.baseConcreteType == nullptr)
+	// 		continue;
+
+	// 	transpiler::DefinedIdentifierPtr pDefinedVariable = DefineFunctionLocalVariable(pType, vParamCtx[i]->identifier(), false, 0);
+	// 	if (pDefinedVariable == nullptr)
+	// 		return false;
+	// }
+	// outSig.parameters = m_transpilerCtx.functionCtx.localScopes.back().concreteType->members;
 
 	return true;
 }
