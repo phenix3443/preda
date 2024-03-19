@@ -3454,7 +3454,7 @@ int PredaRealListener::FindMatchingOverloadedEvent(std::string eventName, std::s
 	return -1;
 }
 
-bool PredaRealListener::GenEventSignatureFromEventDeclareCtx(transpiler::EventSignature &outSig, PredaParser::EventDeclarationContext *declCtx)
+bool PredaRealListener::GenEventSignatureFromEventDeclareCtx(PredaParser::EventDeclarationContext *declCtx, transpiler::EventSignature &outSig)
 {
 	if (!declCtx)
 		return false;
@@ -3477,7 +3477,7 @@ bool PredaRealListener::GenEventSignatureFromEventDeclareCtx(transpiler::EventSi
 	return true;
 }
 
-bool PredaRealListener::GenEventSignatureFromEventStatementCtx(transpiler::EventSignature &outSig, PredaParser::EventStatementContext *ctx)
+bool PredaRealListener::GenEventSignatureFromEventStatementCtx(PredaParser::EventStatementContext *ctx, transpiler::EventSignature &outSig)
 {
 	// if (!ctx)
 	// 	return false;

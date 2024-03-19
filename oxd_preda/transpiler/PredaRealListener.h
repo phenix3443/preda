@@ -223,9 +223,9 @@ private:
 	void PropagateFunctionFlagAcrossCallingGraph();
 	void TraverseAllFunctions();
 	void DeclareEvent(PredaParser::EventDeclarationContext *ctx);
+	bool GenEventSignatureFromEventDeclareCtx(PredaParser::EventDeclarationContext* ctx,transpiler::EventSignature &outSig);
+	bool GenEventSignatureFromEventStatementCtx(PredaParser::EventStatementContext* ctx,transpiler::EventSignature &outSig);
 	bool GenerateEventNotifyArguments(PredaParser::EventStatementContext *ctx, std::string &outSynthesizedArgumentsString);
-	bool GenEventSignatureFromEventDeclareCtx(transpiler::EventSignature &outSig, PredaParser::EventDeclarationContext *declCtx);
-	bool GenEventSignatureFromEventStatementCtx(transpiler::EventSignature &outSig, PredaParser::EventStatementContext *ctx);
 	int FindMatchingOverloadedEvent(std::string eventName, std::string &outSynthesizedArgumentsString);
 
 public:
