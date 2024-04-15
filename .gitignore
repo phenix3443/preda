@@ -27,3 +27,4 @@ bin_release/
 oxd_libsec/lib/
 .vs
 .cache/
+oxd_preda/bin/
