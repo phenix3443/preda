@@ -2,7 +2,7 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "Cmake configure",
+      "label": "configure oxd_libsec",
       "type": "shell",
       "command": "cmake",
       "windows": {
@@ -32,9 +32,79 @@
           "-DBUNDLE_OPS=ON"
         ]
       },
+      "linux": {
+        "args": [
+          "-S",
+          "./",
+          "-B",
+          "./build",
+          "-G",
+          "Unix Makefiles",
+          "-DDOWNLOAD_IPP=ON"
+        ]
+      },
+      "problemMatcher": [],
+      "detail": "Set the compile parameters",
+      "options": {
+        "cwd": "${workspaceFolder}/oxd_libsec"
+      }
+    },
+    {
+      "label": "build oxd_libsec",
+      "type": "shell",
+      "command": "cmake",
+      "args": ["--build", "./build", "--config", "Debug"],
       "group": {
         "kind": "build",
         "isDefault": true
+      },
+      "problemMatcher": [],
+      "detail": "CMake build in Debug mode",
+      "options": {
+        "cwd": "${workspaceFolder}/oxd_libsec"
+      }
+    },
+    {
+      "label": "configure oxd_preda",
+      "type": "shell",
+      "command": "cmake",
+      "windows": {
+        "args": [
+          "-S",
+          "./",
+          "-B",
+          "./build",
+          "-G",
+          "'Visual Studio 16 2019'",
+          "-DDOWNLOAD_IPP=ON",
+          "-DDOWNLOAD_3RDPARTY=ON",
+          "-DBUNDLE_OPS=ON"
+        ]
+      },
+      "osx": {
+        "args": [
+          "-S",
+          "./",
+          "-B",
+          "./build",
+          "-G",
+          "Xcode",
+          "-CMAKE_BUILD_TYPE=Debug",
+          "-DDOWNLOAD_IPP=ON",
+          "-DDOWNLOAD_3RDPARTY=ON",
+          "-DBUNDLE_OPS=ON"
+        ]
+      },
+      "linux": {
+        "args": [
+          "-S",
+          "./",
+          "-B",
+          "./build",
+          "-G",
+          "Unix Makefiles",
+          "-DDOWNLOAD_IPP=ON"
+        ]
       },
       "problemMatcher": [],
       "detail": "Set the compile parameters",
@@ -43,7 +113,7 @@
       }
     },
     {
-      "label": "CMake Build Debug",
+      "label": "build oxd_preda",
       "type": "shell",
       "command": "cmake",
       "args": ["--build", "./build", "--config", "Debug"],
@@ -58,19 +128,7 @@
       }
     },
     {
-      "label": "CMake Build Realease",
-      "type": "shell",
-      "command": "cmake",
-      "args": ["--build", "./build", "--config", "Release"],
-      "group": {
-        "kind": "test",
-        "isDefault": true
-      },
-      "problemMatcher": [],
-      "detail": "CMake build in Debug mode"
-    },
-    {
-      "label": "CMake Clean",
+      "label": "clean oxd_preda",
       "type": "shell",
       "command": "cmake",
       "args": ["--build", "./build", "--target", "clean"],
@@ -79,7 +137,10 @@
         "isDefault": true
       },
       "problemMatcher": [],
-      "detail": "CMake clean bulid directory"
+      "detail": "CMake clean bulid directory",
+      "options": {
+        "cwd": "${workspaceFolder}/oxd_preda"
+      }
     }
   ]
 }

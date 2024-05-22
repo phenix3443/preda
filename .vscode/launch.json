@@ -19,7 +19,7 @@
       "console": "internalConsole"
     },
     {
-      "name": "run event contract",
+      "name": "debug event contract",
       "type": "cppvsdbg",
       "request": "launch",
       "windows": {
@@ -36,7 +36,7 @@
       "console": "internalConsole"
     },
     {
-      "name": "run encrypt contract",
+      "name": "debug encrypt contract",
       "type": "cppvsdbg",
       "request": "launch",
       "windows": {
@@ -47,7 +47,7 @@
       },
       "args": [
         "${workspaceFolder}/oxd_preda/transpiler/testcase/encrypt.prdts",
-        "-count:10",
+        "-count:4",
         "-stdout"
       ],
       "stopAtEntry": false,
