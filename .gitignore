@@ -5,7 +5,7 @@ output/*
 *.pkg
 !**/.gitkeep
 **/.xmake
-**/.vscode
+
 **/.DS_Store
 *.msi
 *.wixobj

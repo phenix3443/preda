@@ -1,0 +1,59 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "compile event contract",
+      "type": "cppvsdbg",
+      "request": "launch",
+      "windows": {
+        "program": "${workspaceFolder}/oxd_preda/bin/bin_debug/chsimu.exe"
+      },
+      "args": [
+        "-log",
+        "${workspaceFolder}/oxd_preda/transpiler/testcase/event.prd",
+        "-stdout"
+      ],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}/oxd_preda/bin/bin_debug/",
+      "environment": [],
+      "console": "internalConsole"
+    },
+    {
+      "name": "run event contract",
+      "type": "cppvsdbg",
+      "request": "launch",
+      "windows": {
+        "program": "${workspaceFolder}/oxd_preda/bin/bin_debug/chsimu.exe"
+      },
+      "args": [
+        "${workspaceFolder}/oxd_preda/transpiler/testcase/event.prdts",
+        "-count:10",
+        "-stdout"
+      ],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}/oxd_preda/bin/bin_debug/",
+      "environment": [],
+      "console": "internalConsole"
+    },
+    {
+      "name": "run encrypt contract",
+      "type": "cppvsdbg",
+      "request": "launch",
+      "windows": {
+        "program": "${workspaceFolder}/oxd_preda/bin/bin_debug/chsimu.exe"
+      },
+      "osx": {
+        "program": "${workspaceRoot}/oxd_preda/bin/bin_debug/chsimu"
+      },
+      "args": [
+        "${workspaceFolder}/oxd_preda/transpiler/testcase/encrypt.prdts",
+        "-count:10",
+        "-stdout"
+      ],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}/oxd_preda/bin/bin_debug/",
+      "environment": [],
+      "console": "internalConsole"
+    }
+  ]
+}
