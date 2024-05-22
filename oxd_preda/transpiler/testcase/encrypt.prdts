@@ -1,0 +1,22 @@
+random.reseed
+allocate.address 1024
+chain.gaslimit 256
+
+chain.deploy @1 encrypt.prd
+
+log.highlight Encrypt test
+
+log Perparing init test data
+state.set Encrypt.global {m:[1], pk:[2], puk:[3]}
+
+txn2[] = Encrypt.testSHA3 #global {}
+
+chain.info
+
+stopwatch.restart
+chain.run
+stopwatch.report
+
+chain.info
+
+viz.profiling
