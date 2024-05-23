@@ -40,4 +40,14 @@ namespace transpiler {
 
 		PredaTranspilerContext *pTranspilerContext = nullptr;
 	};
+
+	// Built-in util struct
+	struct BuiltInUtilStructType : public ConcreteType {
+		BuiltInUtilStructType(PredaTranspilerContext *inTranspilerContext);
+		void Init();
+		static std::shared_ptr<BuiltInUtilStructType> CreateType(PredaTranspilerContext *inTranspilerContext);
+
+		PredaTranspilerContext *pTranspilerContext = nullptr;
+	};
+	
 }

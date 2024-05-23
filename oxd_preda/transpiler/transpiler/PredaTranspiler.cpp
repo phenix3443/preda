@@ -442,6 +442,7 @@ namespace transpiler{
 		res = res && (globalType->AttachInnerConcreteType(debugStructType));
 		res = res && (globalType->DefineMemberVariable(debugStructType, "__debug", 0, true, false, true));
 
+		// TODO：这里添加 util 代码
 		assert(res);
 
 		{

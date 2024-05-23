@@ -239,4 +239,101 @@ namespace transpiler {
 		ret->Init();
 		return ret;
 	}
+
+	/*
+		BuiltInUtilStructType : Built-in util struct type
+	*/
+	BuiltInUtilStructType::BuiltInUtilStructType(PredaTranspilerContext *inTranspilerContext)
+		: ConcreteType(ConcreteType::SystemReservedType)
+	{
+		assert(inTranspilerContext != nullptr);
+		pTranspilerContext = inTranspilerContext;
+	}
+
+	void BuiltInUtilStructType::Init()
+	{
+		inputName = "__@util";
+		outputFullName = typeOutputPrefix + inputName;
+		exportName = inputName;
+		supportedOperatorMask = uint64_t(OperatorTypeBitMask::DotBit);
+
+		std::vector<ConcreteTypePtr> templateParams(1, pTranspilerContext->GetBuiltInIntegerType(8,false));
+		ConcreteTypePtr arrayOfUint8Type = pTranspilerContext->GetBuiltInArrayType()->GetConcreteTypeFromTemplateParams(templateParams);
+
+		{
+			bool res = true;
+			{
+				FunctionSignature signature;
+				signature.flags = uint32_t(FunctionFlags::IsConst);
+				signature.returnType = QualifiedConcreteType(arrayOfUint8Type, true, false);
+				signature.parameters.push_back(Allocator::New<DefinedIdentifier>(arrayOfUint8Type, true, true, "data", 0));
+				res = res && (DefineMemberFunction("sha3", signature, false) != nullptr);
+			}
+
+			{
+				FunctionSignature signature;
+				signature.flags = uint32_t(FunctionFlags::IsConst);
+				signature.returnType = QualifiedConcreteType(arrayOfUint8Type, true, false);
+				signature.parameters.push_back(Allocator::New<DefinedIdentifier>(arrayOfUint8Type, true, true, "data", 0));
+				res = res && (DefineMemberFunction("md5", signature, false) != nullptr);
+			}
+
+			{
+				FunctionSignature signature;
+				signature.flags = uint32_t(FunctionFlags::IsConst);
+				signature.returnType = QualifiedConcreteType(arrayOfUint8Type, true, false);
+				signature.parameters.push_back(Allocator::New<DefinedIdentifier>(arrayOfUint8Type, true, true, "data", 0));
+				res = res && (DefineMemberFunction("sm3", signature, false) != nullptr);
+			}
+
+			{
+				FunctionSignature signature;
+				signature.flags = uint32_t(FunctionFlags::IsConst);
+				signature.returnType = QualifiedConcreteType(arrayOfUint8Type, true, false);
+				signature.parameters.push_back(Allocator::New<DefinedIdentifier>(arrayOfUint8Type, true, true, "data", 0));
+				signature.parameters.push_back(Allocator::New<DefinedIdentifier>(arrayOfUint8Type, true, true, "key", 0));
+				res = res && (DefineMemberFunction("sm4_enc", signature, false) != nullptr);
+			}
+
+			{
+				FunctionSignature signature;
+				signature.flags = uint32_t(FunctionFlags::IsConst);
+				signature.returnType = QualifiedConcreteType(arrayOfUint8Type, true, false);
+				signature.parameters.push_back(Allocator::New<DefinedIdentifier>(arrayOfUint8Type, true, true, "data", 0));
+				signature.parameters.push_back(Allocator::New<DefinedIdentifier>(arrayOfUint8Type, true, true, "key", 0));
+				res = res && (DefineMemberFunction("sm4_dec", signature, false) != nullptr);
+			}
+
+
+			{
+				FunctionSignature signature;
+				signature.flags = uint32_t(FunctionFlags::IsConst);
+				signature.returnType = QualifiedConcreteType(arrayOfUint8Type, true, false);
+				signature.parameters.push_back(Allocator::New<DefinedIdentifier>(arrayOfUint8Type, true, true, "data", 0));
+				signature.parameters.push_back(Allocator::New<DefinedIdentifier>(arrayOfUint8Type, true, true, "private_key", 0));
+				res = res && (DefineMemberFunction("sm2_sign", signature, false) != nullptr);
+			}
+
+			{
+				FunctionSignature signature;
+				signature.flags = uint32_t(FunctionFlags::IsConst);
+				signature.returnType = QualifiedConcreteType(arrayOfUint8Type, true, false);
+				signature.parameters.push_back(Allocator::New<DefinedIdentifier>(arrayOfUint8Type, true, true, "data", 0));
+				signature.parameters.push_back(Allocator::New<DefinedIdentifier>(arrayOfUint8Type, true, true, "sign", 0));
+				signature.parameters.push_back(Allocator::New<DefinedIdentifier>(arrayOfUint8Type, true, true, "public_key", 0));
+				res = res && (DefineMemberFunction("sm2_verify", signature, false) != nullptr);
+			}
+
+
+			assert(res);
+		}
+	}
+
+	std::shared_ptr<BuiltInUtilStructType> BuiltInUtilStructType::CreateType(PredaTranspilerContext *inTranspilerContext)
+	{
+		std::shared_ptr<BuiltInUtilStructType> ret = Allocator::New<BuiltInUtilStructType>(inTranspilerContext);
+		ret->Init();
+		return ret;
+	}
+	
 }

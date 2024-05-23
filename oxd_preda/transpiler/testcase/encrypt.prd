@@ -20,23 +20,23 @@ contract Encrypt{
 		return data;
 	}
 
-	function  array<uint8> sm4_enc(array<uint8> data, array<uint8> privateKey){
+	function  array<uint8> sm4_enc(array<uint8> data, array<uint8> key){
 		__debug.print("call sm4_enc");
 		return data;
 	}
 
-	function array<uint8> sm4_dec(array<uint8> encrypted, array<uint8> privateKey)  {
+	function array<uint8> sm4_dec(array<uint8> encrypted, array<uint8> key)  {
 		__debug.print("call sm4_dec");
 		return m;
 	}
 
 
-	function array<uint8> sm2_sign(array<uint8> data)  {
+	function array<uint8> sm2_sign(array<uint8> data, array<uint8> privateKey)  {
 		__debug.print("call sm2_sign");
 		return m;
 	}
 
-	function bool sm2_verify(array<uint8> data,  array<uint8> singed) {
+	function bool sm2_verify(array<uint8> data,  array<uint8> singed, array<uint8> publicKey) {
 		__debug.print("call sm2_verify");
 		return true;
 	}
@@ -65,7 +65,7 @@ contract Encrypt{
 	}
 
 	function TestSM2() export{
-		array<uint8> signed = sm2_sign(m);
-		__debug.assert(sm2_verify(m, signed),"verify failed");
+		array<uint8> signed = sm2_sign(m, pk);
+		__debug.assert(sm2_verify(m, signed, puk),"verify failed");
 	}
 }

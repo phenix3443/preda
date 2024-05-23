@@ -77,7 +77,7 @@
           "-G",
           "'Visual Studio 16 2019'",
           "-DDOWNLOAD_IPP=ON",
-          "-DDOWNLOAD_3RDPARTY=ON",
+          "-DDOWNLOAD_3RDPARTY=OFF",
           "-DBUNDLE_OPS=ON"
         ]
       },
