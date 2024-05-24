@@ -24,5 +24,7 @@ preda-toolchain.exe
 .cache/
 *.html
 .antlr/
-oxd_preda/bin/bin_debug/
+bin_debug/
 oxd_libsec/lib/
+bin_release/
+dist/

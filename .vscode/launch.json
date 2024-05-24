@@ -2,11 +2,14 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "compile event contract",
+      "name": "compile event contract on windows",
       "type": "cppvsdbg",
       "request": "launch",
       "windows": {
         "program": "${workspaceFolder}/oxd_preda/bin/bin_debug/chsimu.exe"
+      },
+      "osx": {
+        "program": "${workspaceFolder}/oxd_preda/bin/bin_debug/chsimu"
       },
       "args": [
         "-log",
@@ -19,11 +22,14 @@
       "console": "internalConsole"
     },
     {
-      "name": "debug event contract",
+      "name": "debug event contract on windows",
       "type": "cppvsdbg",
       "request": "launch",
       "windows": {
         "program": "${workspaceFolder}/oxd_preda/bin/bin_debug/chsimu.exe"
+      },
+      "osx": {
+        "program": "${workspaceFolder}/oxd_preda/bin/bin_debug/chsimu"
       },
       "args": [
         "${workspaceFolder}/oxd_preda/transpiler/testcase/event.prdts",
@@ -36,24 +42,34 @@
       "console": "internalConsole"
     },
     {
-      "name": "debug encrypt contract",
+      "name": "debug encrypt contract on windows",
       "type": "cppvsdbg",
       "request": "launch",
-      "windows": {
-        "program": "${workspaceFolder}/oxd_preda/bin/bin_debug/chsimu.exe"
-      },
-      "osx": {
-        "program": "${workspaceRoot}/oxd_preda/bin/bin_debug/chsimu"
-      },
+      "program": "${workspaceFolder}/oxd_preda/bin/bin_debug/chsimu.exe",
       "args": [
         "${workspaceFolder}/oxd_preda/transpiler/testcase/encrypt.prdts",
         "-count:4",
         "-stdout"
       ],
       "stopAtEntry": false,
-      "cwd": "${workspaceFolder}/oxd_preda/bin/bin_debug/",
+      "cwd": "${workspaceFolder}/oxd_preda/bin/bin_release/",
+      "environment": []
+    },
+    {
+      "name": "debug encrypt contract on osx",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/oxd_preda/bin/bin_release/chsimu",
+      "args": [
+        "${workspaceFolder}/oxd_preda/transpiler/testcase/encrypt.prdts",
+        "-count:4",
+        "-stdout"
+      ],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}/oxd_preda/bin/bin_release/",
       "environment": [],
-      "console": "internalConsole"
+      "MIMode": "gdb",
+      "miDebuggerPath": "/usr/local/bin/gdb"
     }
   ]
 }
