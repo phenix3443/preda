@@ -120,51 +120,12 @@
     },
     {
       "label": "configure all",
-      "type": "shell",
-      "command": "cmake",
-      "windows": {
-        "args": [
-          "-S",
-          "./",
-          "-B",
-          "./build",
-          "-G",
-          "'Visual Studio 16 2019'",
-          "-DDOWNLOAD_IPP=ON",
-          "-DDOWNLOAD_3RDPARTY=ON"
-        ]
-      },
-      "osx": {
-        "args": [
-          "-S",
-          "./",
-          "-B",
-          "./build",
-          "-G",
-          "Xcode",
-          "-DDOWNLOAD_IPP=ON",
-          "-DDOWNLOAD_3RDPARTY=ON"
-        ]
-      },
-      "linux": {
-        "args": [
-          "-S",
-          "./",
-          "-B",
-          "./build",
-          "-G",
-          "Unix Makefiles",
-          "-DDOWNLOAD_IPP=ON",
-          "-DDOWNLOAD_3RDPARTY=OFF"
-        ]
-      },
-      "problemMatcher": [],
-      "detail": "Set the compile parameters"
+      "dependsOn": ["configure oxd_libsec", "configure oxd_preda"]
     },
     {
       "label": "build all",
       "detail": "Build oxd_libsec and oxd_preda",
-      "dependsOn": ["configure all"]
+      "dependsOn": ["configure all", "build oxd_libsec", "build oxd_preda"]
     },
     {
       "label": "clean all",
