@@ -68,8 +68,7 @@
       "stopAtEntry": false,
       "cwd": "${workspaceFolder}/oxd_preda/bin/bin_release/",
       "environment": [],
-      "MIMode": "gdb",
-      "miDebuggerPath": "/usr/local/bin/gdb"
+      "MIMode": "lldb"
     }
   ]
 }
