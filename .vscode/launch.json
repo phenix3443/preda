@@ -5,12 +5,7 @@
       "name": "compile event contract on windows",
       "type": "cppvsdbg",
       "request": "launch",
-      "windows": {
-        "program": "${workspaceFolder}/oxd_preda/bin/bin_debug/chsimu.exe"
-      },
-      "osx": {
-        "program": "${workspaceFolder}/oxd_preda/bin/bin_debug/chsimu"
-      },
+      "program": "${workspaceFolder}/oxd_preda/bin/bin_debug/chsimu.exe",
       "args": [
         "-log",
         "${workspaceFolder}/oxd_preda/transpiler/testcase/event.prd",
@@ -25,12 +20,7 @@
       "name": "debug event contract on windows",
       "type": "cppvsdbg",
       "request": "launch",
-      "windows": {
-        "program": "${workspaceFolder}/oxd_preda/bin/bin_debug/chsimu.exe"
-      },
-      "osx": {
-        "program": "${workspaceFolder}/oxd_preda/bin/bin_debug/chsimu"
-      },
+      "program": "${workspaceFolder}/oxd_preda/bin/bin_debug/chsimu.exe",
       "args": [
         "${workspaceFolder}/oxd_preda/transpiler/testcase/event.prdts",
         "-count:10",
