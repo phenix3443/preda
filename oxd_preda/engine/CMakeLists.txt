@@ -53,6 +53,17 @@ source_group("PredaEngine/ExecutionEngine/RuntimeInterface" FILES ${RuntimeInter
 source_group("PredaEngine/ExecutionEngine" FILES ${ExecutionEngine})
 source_group("rocksdb" FILES ${ROCKSDB})
 source_group("Source Files" FILES "${main}")
+
+include(FetchContent)
+
+FetchContent_Declare(
+  botan
+  GIT_REPOSITORY https://github.com/randombit/botan.git
+  GIT_TAG 3.4.0
+)
+
+FetchContent_MakeAvailable(botan)
+
 add_library(preda_engine SHARED ${main} ${PREDA_ENGINE_FILES} ${PREDA_ENGINE_FILES_RVM} ${EVMEngine} ${native} ${ExecutionEngine} ${RuntimeInterface} ${ROCKSDB})
 target_sources(preda_engine
   PRIVATE
@@ -79,7 +90,7 @@ target_link_directories(preda_engine PRIVATE
   ../3rdParty/wasmtime/lib
   ../../oxd_libsec/lib
 )
-target_link_libraries(preda_engine PRIVATE "oxd_libsec$<$<CONFIG:Debug>:_d>")
+target_link_libraries(preda_engine PRIVATE "oxd_libsec$<$<CONFIG:Debug>:_d>" botan)
 
 if(WIN32)
   if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")

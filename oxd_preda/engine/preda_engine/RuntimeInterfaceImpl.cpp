@@ -7,7 +7,8 @@
 #include "ExecutionEngine.h"
 #include "ContractDatabase.h"
 #include "RuntimeInterfaceImpl.h"
-
+#include <botan/hex.h>
+#include <botan/hash.h>
 
 
 namespace _details
@@ -903,9 +904,30 @@ void CRuntimeInterface::Event_Exception(const char* msg, prlrt::ExceptionType ex
 
 void CRuntimeInterface::Util_SHA3(uint8_t*  data, uint8_t* out)
 {
-	std::cout << "Util_SHA3" << std::endl;
-	
+	try {
+        Botan::LibraryInitializer init;
+        std::unique_ptr<Botan::HashFunction> hash(Botan::HashFunction::create("SHA-3(256)"));
 
+        if (!hash) {
+            std::cerr << "SHA-3(256) is not available" << std::endl;
+            return 1;
+        }
+
+        
+        std::string input = "Hello, world!";
+        hash->update(input);
+
+       
+        std::vector<uint8_t> hash_value = hash->final();
+
+       
+        std::cout << "SHA-3(256) hash: " << Botan::hex_encode(hash_value) << std::endl;
+    } catch (const std::exception& e) {
+        std::cerr << "Exception caught: " << e.what() << std::endl;
+        return ;
+    }
+
+	std::cout << "Util_SHA3" << std::endl;
 	return ;
 }
 
