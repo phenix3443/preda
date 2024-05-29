@@ -4,68 +4,30 @@ contract Encrypt{
 	@global array<uint8> pk;
 	@global array<uint8> puk;
 
-	// mock start
-	function array<uint8> sha3(array<uint8> data) {
-		__debug.print("call sha3");
-		return data;
-	}
-
-	function array<uint8> md5(array<uint8> data)  {
-		__debug.print ("call md5");
-		return data;
-	}
-
-	function  array<uint8> sm3 (array<uint8> data){
-		__debug.print("call md5");
-		return data;
-	}
-
-	function  array<uint8> sm4_enc(array<uint8> data, array<uint8> key){
-		__debug.print("call sm4_enc");
-		return data;
-	}
-
-	function array<uint8> sm4_dec(array<uint8> encrypted, array<uint8> key)  {
-		__debug.print("call sm4_dec");
-		return m;
-	}
-
-
-	function array<uint8> sm2_sign(array<uint8> data, array<uint8> privateKey)  {
-		__debug.print("call sm2_sign");
-		return m;
-	}
-
-	function bool sm2_verify(array<uint8> data,  array<uint8> singed, array<uint8> publicKey) {
-		__debug.print("call sm2_verify");
-		return true;
-	}
-
-	// mock end
 
 	function testSHA3() export {
-		array<uint8> hashed = sha3(m);
+		const array<uint8> hashed = __util.sha3(m);
 		__debug.print(hashed);
 	}
 
 	function testMD5() export{
-		array<uint8> hashed = md5(m);
+		const array<uint8> hashed = __util.md5(m);
 		__debug.print(hashed);
 	}
 
 	function testSM3() export{
-		array<uint8> hashed = sm3(m);
+		const array<uint8> hashed = __util.sm3(m);
 		__debug.print(hashed);
 	}
 	
 	function testSM4() export{
-		array<uint8> encrypted = sm4_enc(m, pk);
-		array<uint8> decrypted = sm4_dec(encrypted, pk);
+		const array<uint8> encrypted = __util.sm4_enc(m, pk);
+		const array<uint8> decrypted = __util.sm4_dec(encrypted, pk);
 		__debug.assert(m[uint32(0)]==decrypted[uint32(0)], "data != decrypted");
 	}
 
 	function TestSM2() export{
-		array<uint8> signed = sm2_sign(m, pk);
-		__debug.assert(sm2_verify(m, signed, puk),"verify failed");
+		const array<uint8> sign = __util.sm2_sign(m, pk);
+		__debug.assert(__util.sm2_verify(m, sign, puk), "verify failed");
 	}
 }

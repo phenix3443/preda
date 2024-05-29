@@ -8,6 +8,8 @@
 #include "ContractDatabase.h"
 #include "RuntimeInterfaceImpl.h"
 
+
+
 namespace _details
 {
 	struct AddressInplaceBuffer : public rvm::DataBuffer
@@ -896,4 +898,50 @@ void CRuntimeInterface::Event_Exception(const char* msg, prlrt::ExceptionType ex
 	// `curr_exc` is set to a stack value before calling any method inside vm
 	ASSERT(!exec_stack.empty());
 	exec_stack.top() = exc_type;
+}
+
+
+void CRuntimeInterface::Util_SHA3(uint8_t*  data, uint8_t* out)
+{
+	std::cout << "Util_SHA3" << std::endl;
+	
+
+	return ;
+}
+
+void CRuntimeInterface::Util_MD5(uint8_t* data, uint8_t* out)
+{
+	std::cout << "Util_MD5" << std::endl;
+	return ;
+}
+
+void CRuntimeInterface::Util_SM3(uint8_t* data, uint8_t* out)
+{
+	std::cout << "Util_SM3" << std::endl;
+	return ;
+}
+
+void CRuntimeInterface::Util_SM4Enc(uint8_t* data, uint8_t* key, uint8_t* out)
+{
+	std::cout << "Util_SM4Enc" << std::endl;
+	return ;
+}
+
+void CRuntimeInterface::Util_SM4Dec(uint8_t* encrypted, uint8_t* key, uint8_t* out)
+{
+	std::cout << "Util_SM4Dec" << std::endl;
+	return ;
+}
+
+
+void CRuntimeInterface::Util_SM2Sign(uint8_t* data, uint8_t* private_key, uint8_t* out)
+{
+	std::cout << "Util_SM2Sign" << std::endl;
+	return ;
+}
+
+bool CRuntimeInterface::Util_SM2Verify(uint8_t* data, uint8_t* signedData, uint8_t* public_key)
+{ 
+	std::cout << "Util_SM2Verify"  << std:: endl;
+	return true;
 }

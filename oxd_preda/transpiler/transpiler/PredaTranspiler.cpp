@@ -442,7 +442,9 @@ namespace transpiler{
 		res = res && (globalType->AttachInnerConcreteType(debugStructType));
 		res = res && (globalType->DefineMemberVariable(debugStructType, "__debug", 0, true, false, true));
 
-		// TODO：这里添加 util 代码
+		ConcreteTypePtr utilStructType = BuiltInUtilStructType::CreateType(this);
+		res = res && (globalType->AttachInnerConcreteType(utilStructType));
+		res = res && (globalType->DefineMemberVariable(utilStructType, "__util", 0, true, false, true));
 		assert(res);
 
 		{

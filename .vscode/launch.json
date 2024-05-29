@@ -32,6 +32,20 @@
       "console": "internalConsole"
     },
     {
+      "name": "compile encrypt contract on windows",
+      "type": "cppvsdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/oxd_preda/bin/bin_debug/chsimu.exe",
+      "args": [
+        "${workspaceFolder}/oxd_preda/transpiler/testcase/encrypt.prd",
+        "-count:4",
+        "-stdout"
+      ],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}/oxd_preda/bin/bin_debug/",
+      "environment": []
+    },
+    {
       "name": "debug encrypt contract on windows",
       "type": "cppvsdbg",
       "request": "launch",
@@ -49,14 +63,14 @@
       "name": "debug encrypt contract on osx",
       "type": "cppdbg",
       "request": "launch",
-      "program": "${workspaceFolder}/oxd_preda/bin/bin_release/chsimu",
+      "program": "${workspaceFolder}/oxd_preda/bin/bin_debug/chsimu",
       "args": [
         "${workspaceFolder}/oxd_preda/transpiler/testcase/encrypt.prdts",
         "-count:4",
         "-stdout"
       ],
       "stopAtEntry": false,
-      "cwd": "${workspaceFolder}/oxd_preda/bin/bin_release/",
+      "cwd": "${workspaceFolder}/oxd_preda/bin/bin_debug/",
       "environment": [],
       "MIMode": "lldb"
     }

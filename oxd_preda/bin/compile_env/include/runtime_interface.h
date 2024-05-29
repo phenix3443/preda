@@ -265,7 +265,16 @@ namespace prlrt {
 	V(::prlrt::uievent_state, Event_GetUserState)\
 	V(void, Event_Push, uint32_t id, const char* pData, uint32_t dataLen)\
 	V(void, Event_Notify, uint32_t id, const char* pData, uint32_t dataLen)\
-	V(void, Event_Exception, const char *msg, ::prlrt::ExceptionType exc_type)
+	V(void, Event_Exception, const char *msg, ::prlrt::ExceptionType exc_type)\
+\
+	/*  util context */\
+	V(void, Util_SHA3, uint8_t* data, uint8_t* out)\
+	V(void, Util_MD5, uint8_t* data, uint8_t* out)\
+	V(void, Util_SM3, uint8_t* data, uint8_t* out)\
+	V(void, Util_SM4Enc, uint8_t* data, uint8_t* key, uint8_t* encrypted)\
+	V(void, Util_SM4Dec, uint8_t* encrypted, uint8_t* key, uint8_t* out)\
+	V(void, Util_SM2Sign, uint8_t* data, uint8_t* private_key, uint8_t* out) \
+	V(bool, Util_SM2Verify, uint8_t* data, uint8_t* signature, uint8_t* public_key)
 
 #if defined(__wasm32__)
 #define PREDA_INTERFACE_METHOD_V(RET, FN, ...) RET preda##FN(__VA_ARGS__);

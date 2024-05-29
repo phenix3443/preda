@@ -3,6 +3,7 @@
 #include "inttypes.h"
 #include "address_blob_hash_types.h"
 #include "arraytype.h"
+#include <iostream>
 
 namespace prlrt {
 
@@ -191,3 +192,57 @@ namespace prlrt {
 }
 
 prlrt::__prlt___debug __prli___debug;
+
+
+namespace prlrt {
+	struct __prlt__util {
+		__prlt_array<__prlt_uint8> __prli_sha3(__prlt_array<__prlt_uint8> data)
+		{
+			__prlt_array<__prlt_uint8> ret;
+			PREDA_CALL(Util_SHA3, NULL,  NULL);
+			return ret;
+		}
+
+		__prlt_array<__prlt_uint8> __prli_md5(__prlt_array<__prlt_uint8> data)
+		{
+			__prlt_array<__prlt_uint8> ret;
+			PREDA_CALL(Util_MD5, NULL,  NULL );
+			return ret;
+		}
+
+		__prlt_array<__prlt_uint8> __prli_sm3(__prlt_array<__prlt_uint8> data)
+		{
+			__prlt_array<__prlt_uint8> ret;
+			PREDA_CALL(Util_SM3,NULL,  NULL );
+			return ret;
+		}
+
+		__prlt_array<__prlt_uint8> __prli_sm4_enc(__prlt_array<__prlt_uint8> data, __prlt_array<__prlt_uint8> key)
+		{
+			__prlt_array<__prlt_uint8> ret;
+			PREDA_CALL(Util_SM4Enc, NULL,  NULL,NULL);
+			return ret;
+		}
+
+		__prlt_array<__prlt_uint8> __prli_sm4_dec(__prlt_array<__prlt_uint8> encrypted, __prlt_array<__prlt_uint8> key)
+		{
+			__prlt_array<__prlt_uint8> ret;
+			PREDA_CALL(Util_SM4Dec, NULL,  NULL,NULL);
+			return ret;
+		}
+
+		__prlt_array<__prlt_uint8> __prli_sm2_sign(__prlt_array<__prlt_uint8> data, __prlt_array<__prlt_uint8> private_key)
+		{
+			__prlt_array<__prlt_uint8> ret;
+			PREDA_CALL(Util_SM2Sign, NULL,  NULL,NULL );
+			return ret;
+		}
+
+		__prlt_bool __prli_sm2_verify(__prlt_array<__prlt_uint8> data, __prlt_array<__prlt_uint8> signed_data, __prlt_array<__prlt_uint8> public_key)
+		{
+			return PREDA_CALL(Util_SM2Verify, NULL, NULL,NULL );
+		}
+	};
+}
+
+prlrt::__prlt__util __prli___util;

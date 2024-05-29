@@ -317,7 +317,7 @@ namespace transpiler {
 			{
 				FunctionSignature signature;
 				signature.flags = uint32_t(FunctionFlags::IsConst);
-				signature.returnType = QualifiedConcreteType(arrayOfUint8Type, true, false);
+				signature.returnType = QualifiedConcreteType(pTranspilerContext->GetBuiltInBoolType(), true, false);
 				signature.parameters.push_back(Allocator::New<DefinedIdentifier>(arrayOfUint8Type, true, true, "data", 0));
 				signature.parameters.push_back(Allocator::New<DefinedIdentifier>(arrayOfUint8Type, true, true, "sign", 0));
 				signature.parameters.push_back(Allocator::New<DefinedIdentifier>(arrayOfUint8Type, true, true, "public_key", 0));
@@ -335,5 +335,4 @@ namespace transpiler {
 		ret->Init();
 		return ret;
 	}
-	
 }
