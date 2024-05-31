@@ -271,7 +271,7 @@ namespace prlrt {
 	V(void, Util_SHA3, uint8_t* data, uint8_t* out)\
 	V(void, Util_MD5, uint8_t* data, uint8_t* out)\
 	V(void, Util_SM3, uint8_t* data, uint8_t* out)\
-	V(void, Util_SM4Enc, uint8_t* data, uint8_t* key, uint8_t* encrypted)\
+	V(void, Util_SM4Enc, uint8_t* data, uint8_t* key, uint8_t* out)\
 	V(void, Util_SM4Dec, uint8_t* encrypted, uint8_t* key, uint8_t* out)\
 	V(void, Util_SM2Sign, uint8_t* data, uint8_t* private_key, uint8_t* out) \
 	V(bool, Util_SM2Verify, uint8_t* data, uint8_t* signature, uint8_t* public_key)
