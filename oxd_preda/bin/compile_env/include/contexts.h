@@ -198,49 +198,92 @@ namespace prlrt {
 	struct __prlt__util {
 		__prlt_array<__prlt_uint8> __prli_sha3(__prlt_array<__prlt_uint8> data)
 		{
+			prlrt::serialize_size_type s = data.get_serialize_size();
+			uint8_t *buffer = new uint8_t[s];
+			data.serialize_out(buffer, false);
+
+			const uint32_t sha3_output_len = 32; 
+			std::vector<uint8_t> output_buffer(sha3_output_len);
+
+			PREDA_CALL(Util_SHA3, buffer, s, output_buffer.data(), sha3_output_len);
+
 			__prlt_array<__prlt_uint8> ret;
-			PREDA_CALL(Util_SHA3, NULL,  NULL);
+			for (uint32_t i = 0; i < sha3_output_len; ++i) {
+        		ret.__prli_push(output_buffer[i]);
+    		}
+			delete [] buffer;
 			return ret;
 		}
 
 		__prlt_array<__prlt_uint8> __prli_md5(__prlt_array<__prlt_uint8> data)
 		{
+			prlrt::serialize_size_type s = data.get_serialize_size();
+			uint8_t *buffer = new uint8_t[s];
+			data.serialize_out(buffer, false);
+
+			const uint32_t output_len = 16; 
+			std::vector<uint8_t> output_buffer(output_len);
+
+			PREDA_CALL(Util_MD5, buffer, s,  output_buffer.data(), output_len);
+
 			__prlt_array<__prlt_uint8> ret;
-			PREDA_CALL(Util_MD5, NULL,  NULL );
+			for (uint32_t i = 0; i < output_len; ++i) {
+				ret.__prli_push(output_buffer[i]);
+			}
+			delete[] buffer;
 			return ret;
 		}
 
 		__prlt_array<__prlt_uint8> __prli_sm3(__prlt_array<__prlt_uint8> data)
 		{
+			prlrt::serialize_size_type s = data.get_serialize_size();
+			uint8_t *buffer = new uint8_t[s];
+			data.serialize_out(buffer, false);
+
+			const uint32_t output_len = 32; 
+			std::vector<uint8_t> output_buffer(output_len);
+
+			PREDA_CALL(Util_SM3,buffer, s,  output_buffer.data(), output_len);
 			__prlt_array<__prlt_uint8> ret;
-			PREDA_CALL(Util_SM3,NULL,  NULL );
+			for (uint32_t i = 0; i < output_len; ++i) {
+				ret.__prli_push(output_buffer[i]);
+			}
+			delete[] buffer;
 			return ret;
 		}
 
 		__prlt_array<__prlt_uint8> __prli_sm4_enc(__prlt_array<__prlt_uint8> data, __prlt_array<__prlt_uint8> key)
 		{
+			prlrt::serialize_size_type data_len = data.get_serialize_size();
+			uint8_t *data_buffer = new uint8_t[data_len];
+			data.serialize_out(data_buffer, false);
+
+			prlrt::serialize_size_type key_len = data.get_serialize_size();
+			uint8_t *key_buffer = new uint8_t[key_len];
+			data.serialize_out(key_buffer, false);
+
 			__prlt_array<__prlt_uint8> ret;
-			PREDA_CALL(Util_SM4Enc, NULL,  NULL,NULL);
+			PREDA_CALL(Util_SM4Enc, data_buffer, data_len, key_buffer, key_len, NULL, 0);
 			return ret;
 		}
 
 		__prlt_array<__prlt_uint8> __prli_sm4_dec(__prlt_array<__prlt_uint8> encrypted, __prlt_array<__prlt_uint8> key)
 		{
 			__prlt_array<__prlt_uint8> ret;
-			PREDA_CALL(Util_SM4Dec, NULL,  NULL,NULL);
+			PREDA_CALL(Util_SM4Dec, NULL, 0, NULL, 0, NULL, 0);
 			return ret;
 		}
 
 		__prlt_array<__prlt_uint8> __prli_sm2_sign(__prlt_array<__prlt_uint8> data, __prlt_array<__prlt_uint8> private_key)
 		{
 			__prlt_array<__prlt_uint8> ret;
-			PREDA_CALL(Util_SM2Sign, NULL,  NULL,NULL );
+			PREDA_CALL(Util_SM2Sign, NULL, 0, NULL, 0, NULL, 0);
 			return ret;
 		}
 
 		__prlt_bool __prli_sm2_verify(__prlt_array<__prlt_uint8> data, __prlt_array<__prlt_uint8> signed_data, __prlt_array<__prlt_uint8> public_key)
 		{
-			return PREDA_CALL(Util_SM2Verify, NULL, NULL,NULL );
+			return PREDA_CALL(Util_SM2Verify, NULL, 0, NULL, 0, NULL, 0);
 		}
 	};
 }

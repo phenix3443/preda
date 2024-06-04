@@ -902,70 +902,99 @@ void CRuntimeInterface::Event_Exception(const char* msg, prlrt::ExceptionType ex
 }
 
 
-void CRuntimeInterface::Util_SHA3(uint8_t*  data, uint8_t* out)
+void CRuntimeInterface::Util_SHA3(uint8_t* data, uint32_t data_len, uint8_t* out, uint32_t out_len)
+{
+	std::unique_ptr<Botan::HashFunction> hash(Botan::HashFunction::create("SHA-3(256)"));
+	if(!hash) {
+		std::cerr << "SHA-3 not supported by Botan library" << std::endl;
+		return;
+	}
+
+	hash->update(data, data_len);
+	auto hash_output   = hash->final();
+
+	if (out_len < hash_output.size()) {
+        throw std::runtime_error("Output buffer too small for SHA-3 hash");
+    }
+	std::copy(hash_output.begin(), hash_output.end(), out);
+	return ;
+}
+
+void CRuntimeInterface::Util_MD5(uint8_t* data, uint32_t data_len, uint8_t* out, uint32_t out_len)
+{
+	std::unique_ptr<Botan::HashFunction> hash_fn(Botan::HashFunction::create("MD5"));
+    if (!hash_fn) {
+        throw std::runtime_error("MD5 not supported");
+    }
+    hash_fn->update(data, data_len);
+    Botan::secure_vector<uint8_t> hash_output = hash_fn->final();
+    if (out_len < hash_output.size()) {
+        throw std::runtime_error("Output buffer too small for MD5 hash");
+    }
+    std::copy(hash_output.begin(), hash_output.end(), out);
+}
+
+void CRuntimeInterface::Util_SM3(uint8_t* data, uint32_t data_len, uint8_t* out, uint32_t out_len)
+{
+	std::unique_ptr<Botan::HashFunction> hash_fn(Botan::HashFunction::create("SM3"));
+    if (!hash_fn) {
+        throw std::runtime_error("SM3 not supported");
+    }
+    hash_fn->update(data, data_len);
+    Botan::secure_vector<uint8_t> hash_output = hash_fn->final();
+    if (out_len < hash_output.size()) {
+        throw std::runtime_error("Output buffer too small for SM3 hash");
+    }
+    std::copy(hash_output.begin(), hash_output.end(), out);
+}
+
+void CRuntimeInterface::Util_SM4Enc(uint8_t* data, uint32_t data_len, uint8_t* key, uint32_t key_len, uint8_t* out, uint32_t out_len)
 {
 	try {
-        // 创建 SHA-3 哈希函数对象
-        std::unique_ptr<Botan::HashFunction> hash(Botan::HashFunction::create("SHA-3(256)"));
-        if(!hash) {
-            std::cerr << "SHA-3 not supported by Botan library" << std::endl;
-            return ;
+        Botan::AutoSeeded_RNG rng;
+
+        // 生成 SM2 密钥对
+        Botan::EC_Group group("sm2p256v1");
+        Botan::SM2_PrivateKey private_key(rng, group);
+        Botan::SM2_PublicKey public_key = private_key;
+
+        // 签名数据
+        std::string message = "Hello, world!";
+        Botan::PK_Signer signer(private_key, rng, "EMSA1(SM3)");
+        signer.update(message);
+        std::vector<uint8_t> signature = signer.signature(rng);
+
+        std::cout << "Signature: " << Botan::hex_encode(signature) << std::endl;
+
+        // 验证签名
+        Botan::PK_Verifier verifier(public_key, "EMSA1(SM3)");
+        verifier.update(message);
+        bool valid = verifier.check_signature(signature);
+
+        if (valid) {
+            std::cout << "Signature is valid." << std::endl;
+        } else {
+            std::cout << "Signature is invalid." << std::endl;
         }
-
-        // 输入数据
-        std::string input = "Hello, world!";
-        
-        // 计算哈希
-        hash->update(input);
-        auto output = hash->final();
-
-        // 将哈希结果转换为十六进制字符串
-        std::string hex_output = Botan::hex_encode(output);
-
-        // 输出结果
-        std::cout << "SHA-3(256) hash of \"" << input << "\": " << hex_output << std::endl;
-    } catch(std::exception& e) {
+    } catch (std::exception& e) {
         std::cerr << "Exception: " << e.what() << std::endl;
         return ;
     }
 
-
-	std::cout << "Util_SHA3" << std::endl;
-	return ;
 }
 
-void CRuntimeInterface::Util_MD5(uint8_t* data, uint8_t* out)
-{
-	std::cout << "Util_MD5" << std::endl;
-	return ;
-}
-
-void CRuntimeInterface::Util_SM3(uint8_t* data, uint8_t* out)
-{
-	std::cout << "Util_SM3" << std::endl;
-	return ;
-}
-
-void CRuntimeInterface::Util_SM4Enc(uint8_t* data, uint8_t* key, uint8_t* out)
-{
-	std::cout << "Util_SM4Enc" << std::endl;
-	return ;
-}
-
-void CRuntimeInterface::Util_SM4Dec(uint8_t* encrypted, uint8_t* key, uint8_t* out)
+void CRuntimeInterface::Util_SM4Dec(uint8_t* encrypted, uint32_t encrypted_len, uint8_t* key, uint32_t key_len, uint8_t* out, uint32_t out_len)
 {
 	std::cout << "Util_SM4Dec" << std::endl;
 	return ;
 }
 
 
-void CRuntimeInterface::Util_SM2Sign(uint8_t* data, uint8_t* private_key, uint8_t* out)
+void CRuntimeInterface::Util_SM2Sign(uint8_t* data, uint32_t data_len, uint8_t* private_key,  uint32_t key_len, uint8_t* out, uint32_t out_len)
 {
-	std::cout << "Util_SM2Sign" << std::endl;
 	return ;
 }
-
-bool CRuntimeInterface::Util_SM2Verify(uint8_t* data, uint8_t* signedData, uint8_t* public_key)
+bool CRuntimeInterface::Util_SM2Verify(uint8_t* data, uint32_t data_len, uint8_t* signature, uint32_t signature_len, uint8_t* public_key, uint32_t key_len)
 { 
 	std::cout << "Util_SM2Verify"  << std:: endl;
 	return true;
