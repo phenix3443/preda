@@ -950,52 +950,97 @@ void CRuntimeInterface::Util_SM3(uint8_t* data, uint32_t data_len, uint8_t* out,
 
 void CRuntimeInterface::Util_SM4Enc(uint8_t* data, uint32_t data_len, uint8_t* key, uint32_t key_len, uint8_t* out, uint32_t out_len)
 {
-	try {
-        Botan::AutoSeeded_RNG rng;
-
-        // 生成 SM2 密钥对
-        Botan::EC_Group group("sm2p256v1");
-        Botan::SM2_PrivateKey private_key(rng, group);
-        Botan::SM2_PublicKey public_key = private_key;
-
-        // 签名数据
-        std::string message = "Hello, world!";
-        Botan::PK_Signer signer(private_key, rng, "EMSA1(SM3)");
-        signer.update(message);
-        std::vector<uint8_t> signature = signer.signature(rng);
-
-        std::cout << "Signature: " << Botan::hex_encode(signature) << std::endl;
-
-        // 验证签名
-        Botan::PK_Verifier verifier(public_key, "EMSA1(SM3)");
-        verifier.update(message);
-        bool valid = verifier.check_signature(signature);
-
-        if (valid) {
-            std::cout << "Signature is valid." << std::endl;
-        } else {
-            std::cout << "Signature is invalid." << std::endl;
-        }
-    } catch (std::exception& e) {
-        std::cerr << "Exception: " << e.what() << std::endl;
-        return ;
+	if (key_len != 16) {
+        throw std::runtime_error("SM4 key length must be 16 bytes");
+    }
+    if (data_len % 16 != 0) {
+        throw std::runtime_error("SM4 data length must be a multiple of 16 bytes");
+    }
+    if (out_len < data_len) {
+        throw std::runtime_error("Output buffer too small for SM4 encryption");
     }
 
+    std::unique_ptr<Botan::BlockCipher> cipher(Botan::BlockCipher::create("SM4"));
+    if (!cipher) {
+        throw std::runtime_error("SM4 not supported by Botan library");
+    }
+
+    cipher->set_key(key, key_len);
+    for (uint32_t i = 0; i < data_len; i += cipher->block_size()) {
+        cipher->encrypt(data + i, out + i);
+    }
 }
 
 void CRuntimeInterface::Util_SM4Dec(uint8_t* encrypted, uint32_t encrypted_len, uint8_t* key, uint32_t key_len, uint8_t* out, uint32_t out_len)
 {
-	std::cout << "Util_SM4Dec" << std::endl;
+	if (key_len != 16) {
+        throw std::runtime_error("SM4 key length must be 16 bytes");
+    }
+    if (encrypted_len % 16 != 0) {
+        throw std::runtime_error("SM4 encrypted data length must be a multiple of 16 bytes");
+    }
+    if (out_len < encrypted_len) {
+        throw std::runtime_error("Output buffer too small for SM4 decryption");
+    }
+
+    std::unique_ptr<Botan::BlockCipher> cipher(Botan::BlockCipher::create("SM4"));
+    if (!cipher) {
+        throw std::runtime_error("SM4 not supported by Botan library");
+    }
+    cipher->set_key(key, key_len);
+    for (uint32_t i = 0; i < encrypted_len; i += cipher->block_size()) {
+        cipher->decrypt(encrypted + i, out + i);
+    }
 	return ;
 }
 
 
 void CRuntimeInterface::Util_SM2Sign(uint8_t* data, uint32_t data_len, uint8_t* private_key,  uint32_t key_len, uint8_t* out, uint32_t out_len)
-{
+{ 
+	if (out_len < 64) {
+        throw std::runtime_error("Output buffer too small for SM2 signature");
+    }
+
+    Botan::AutoSeeded_RNG rng;
+    Botan::DataSource_Memory key_data(private_key, key_len);
+    std::unique_ptr<Botan::Private_Key> priv_key(Botan::PKCS8::load_key(key_data, rng));
+    if (!priv_key) {
+        throw std::runtime_error("Failed to load private key");
+    }
+
+    Botan::SM2_PrivateKey* sm2_key = dynamic_cast<Botan::SM2_PrivateKey*>(priv_key.get());
+    if (!sm2_key) {
+        throw std::runtime_error("Loaded key is not an SM2 private key");
+    }
+    Botan::PK_Signer signer(*sm2_key, rng, "EMSA1(SM3)");
+
+    signer.update(data, data_len);
+    std::vector<uint8_t> signature = signer.signature(rng);
+
+    if (signature.size() > out_len) {
+        throw std::runtime_error("Output buffer too small for SM2 signature");
+    }
+
+    std::copy(signature.begin(), signature.end(), out);
 	return ;
 }
+
 bool CRuntimeInterface::Util_SM2Verify(uint8_t* data, uint32_t data_len, uint8_t* signature, uint32_t signature_len, uint8_t* public_key, uint32_t key_len)
 { 
-	std::cout << "Util_SM2Verify"  << std:: endl;
-	return true;
+	Botan::AutoSeeded_RNG rng;
+
+    Botan::DataSource_Memory key_data(public_key, key_len);
+    std::unique_ptr<Botan::Public_Key> pub_key(Botan::X509::load_key(key_data));
+
+    if (!pub_key) {
+        throw std::runtime_error("Failed to load public key");
+    }
+
+    Botan::SM2_PublicKey* sm2_key = dynamic_cast<Botan::SM2_PublicKey*>(pub_key.get());
+    if (!sm2_key) {
+        throw std::runtime_error("Loaded key is not an SM2 public key");
+    }
+    Botan::PK_Verifier verifier(*sm2_key, "EMSA1(SM3)");
+    verifier.update(data, data_len);
+    return verifier.check_signature(signature, signature_len);
 }
