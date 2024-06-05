@@ -950,35 +950,46 @@ void CRuntimeInterface::Util_SM3(uint8_t* data, uint32_t data_len, uint8_t* out,
 
 void CRuntimeInterface::Util_SM4Enc(uint8_t* data, uint32_t data_len, uint8_t* key, uint32_t key_len, uint8_t* out, uint32_t out_len)
 {
-	if (key_len != 16) {
-        throw std::runtime_error("SM4 key length must be 16 bytes");
+	const uint32_t block_size = 16;
+
+    std::vector<uint8_t> key_buffer(block_size);
+    for (size_t i = 0; i < block_size; ++i) {
+        key_buffer[i] = key[i % key_len];
     }
-    if (data_len % 16 != 0) {
-        throw std::runtime_error("SM4 data length must be a multiple of 16 bytes");
-    }
-    if (out_len < data_len) {
+
+    uint32_t padded_len = data_len + (block_size - (data_len % block_size));
+    if (out_len < padded_len) {
         throw std::runtime_error("Output buffer too small for SM4 encryption");
     }
+
+    std::vector<uint8_t> padded_data(data, data + data_len);
+    uint8_t padding_value = block_size - (data_len % block_size);
+    padded_data.insert(padded_data.end(), padding_value, padding_value);
 
     std::unique_ptr<Botan::BlockCipher> cipher(Botan::BlockCipher::create("SM4"));
     if (!cipher) {
         throw std::runtime_error("SM4 not supported by Botan library");
     }
 
-    cipher->set_key(key, key_len);
-    for (uint32_t i = 0; i < data_len; i += cipher->block_size()) {
-        cipher->encrypt(data + i, out + i);
+    cipher->set_key(key_buffer.data(), block_size);
+    for (uint32_t i = 0; i < padded_len; i += block_size) {
+        cipher->encrypt(padded_data.data() + i, out + i);
     }
 }
 
-void CRuntimeInterface::Util_SM4Dec(uint8_t* encrypted, uint32_t encrypted_len, uint8_t* key, uint32_t key_len, uint8_t* out, uint32_t out_len)
+void CRuntimeInterface::Util_SM4Dec(uint8_t* encrypted, uint32_t encrypted_len, uint8_t* key, uint32_t key_len, uint8_t* out, uint32_t& out_len)
 {
-	if (key_len != 16) {
-        throw std::runtime_error("SM4 key length must be 16 bytes");
+	const uint32_t block_size = 16;
+
+    std::vector<uint8_t> key_buffer(block_size);
+    for (size_t i = 0; i < block_size; ++i) {
+        key_buffer[i] = key[i % key_len];
     }
-    if (encrypted_len % 16 != 0) {
+
+    if (encrypted_len % block_size != 0) {
         throw std::runtime_error("SM4 encrypted data length must be a multiple of 16 bytes");
     }
+
     if (out_len < encrypted_len) {
         throw std::runtime_error("Output buffer too small for SM4 decryption");
     }
@@ -987,11 +998,22 @@ void CRuntimeInterface::Util_SM4Dec(uint8_t* encrypted, uint32_t encrypted_len, 
     if (!cipher) {
         throw std::runtime_error("SM4 not supported by Botan library");
     }
-    cipher->set_key(key, key_len);
-    for (uint32_t i = 0; i < encrypted_len; i += cipher->block_size()) {
+
+    cipher->set_key(key_buffer.data(), block_size);
+    for (uint32_t i = 0; i < encrypted_len; i += block_size) {
         cipher->decrypt(encrypted + i, out + i);
     }
-	return ;
+
+    uint8_t padding_length = out[encrypted_len - 1];
+    if (padding_length > block_size) {
+        throw std::runtime_error("Invalid padding length");
+    }
+    for (uint32_t i = 0; i < padding_length; ++i) {
+        if (out[encrypted_len - 1 - i] != padding_length) {
+            throw std::runtime_error("Invalid padding");
+        }
+    }
+    out_len = encrypted_len - padding_length;
 }
 
 
@@ -1022,7 +1044,6 @@ void CRuntimeInterface::Util_SM2Sign(uint8_t* data, uint32_t data_len, uint8_t* 
     }
 
     std::copy(signature.begin(), signature.end(), out);
-	return ;
 }
 
 bool CRuntimeInterface::Util_SM2Verify(uint8_t* data, uint32_t data_len, uint8_t* signature, uint32_t signature_len, uint8_t* public_key, uint32_t key_len)

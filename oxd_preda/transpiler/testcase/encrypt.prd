@@ -22,6 +22,7 @@ contract Encrypt{
 	
 	function testSM4() export{
 		const array<uint8> encrypted = __util.sm4_enc(m, pk);
+		__debug.print(encrypted);
 		const array<uint8> decrypted = __util.sm4_dec(encrypted, pk);
 		__debug.assert(m[uint32(0)]==decrypted[uint32(0)], "data != decrypted");
 	}

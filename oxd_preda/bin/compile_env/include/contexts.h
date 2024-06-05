@@ -254,92 +254,84 @@ namespace prlrt {
 
 		__prlt_array<__prlt_uint8> __prli_sm4_enc(__prlt_array<__prlt_uint8> data, __prlt_array<__prlt_uint8> key)
 		{
-			prlrt::serialize_size_type data_size = data.get_serialize_size();
-			prlrt::serialize_size_type key_size = key.get_serialize_size();
+			auto data_size = data.__prli_length()._v;
+			auto key_size = key.__prli_length()._v;
+		
+			uint8_t* data_buffer = new uint8_t[data_size];
+			uint8_t* key_buffer = new uint8_t[key_size];
 
-			const uint32_t sm4_key_len = 16;
-			std::vector<uint8_t> key_buffer(sm4_key_len);
-
-			if (key_size >= sm4_key_len) {
-				key.serialize_out(key_buffer.data(), false);
-			} else {
-				uint8_t* temp_key_buffer = new uint8_t[key_size];
-				key.serialize_out(temp_key_buffer, false);
-				std::memcpy(key_buffer.data(), temp_key_buffer, key_size);
-				delete[] temp_key_buffer;
-
-				for (size_t i = key_size; i < sm4_key_len; ++i) {
-					key_buffer[i] = key_buffer[i % key_size];
-				}
+			for (auto i=0; i<data_size; i++) {
+				data_buffer[i] = data[i]._v;
 			}
 
-			uint8_t* data_buffer = new uint8_t[data_size];
-			data.serialize_out(data_buffer, false);
+			for (auto i=0; i<key_size; i++) {
+				key_buffer[i] = key[i]._v;
+			}
 
-			const uint32_t output_len = data_size;
-			std::vector<uint8_t> output_buffer(output_len);
+			const uint32_t block_size = 16;
+			uint32_t padded_len = data_size + (block_size - (data_size % 16));
+			std::vector<uint8_t> output_buffer(padded_len);
 
-			PREDA_CALL(Util_SM4Enc, data_buffer, data_size, key_buffer.data(), sm4_key_len, output_buffer.data(), output_len);
+			PREDA_CALL(Util_SM4Enc, data_buffer, data_size, key_buffer, key_size, output_buffer.data(), padded_len);
 
 			__prlt_array<__prlt_uint8> ret;
-			for (uint32_t i = 0; i < output_len; ++i) {
+			for (uint32_t i = 0; i < padded_len; ++i) {
 				ret.__prli_push(output_buffer[i]);
 			}
 
 			delete[] data_buffer;
+			delete[] key_buffer;
 
 			return ret;
 		}
 
 		__prlt_array<__prlt_uint8> __prli_sm4_dec(__prlt_array<__prlt_uint8> encrypted, __prlt_array<__prlt_uint8> key)
 		{
-			prlrt::serialize_size_type encrypted_size = encrypted.get_serialize_size();
-			prlrt::serialize_size_type key_size = key.get_serialize_size();
-
-			const uint32_t sm4_key_len = 16;
-			std::vector<uint8_t> key_buffer(sm4_key_len);
-
-			if (key_size >= sm4_key_len) {
-				key.serialize_out(key_buffer.data(), false);
-			} else {
-				uint8_t* temp_key_buffer = new uint8_t[key_size];
-				key.serialize_out(temp_key_buffer, false);
-				std::memcpy(key_buffer.data(), temp_key_buffer, key_size);
-				delete[] temp_key_buffer;
-
-				for (size_t i = key_size; i < sm4_key_len; ++i) {
-					key_buffer[i] = key_buffer[i % key_size];
-				}
-			}
+			auto encrypted_size = encrypted.__prli_length()._v;
+			auto key_size = key.__prli_length()._v;
 
 			uint8_t* encrypted_buffer = new uint8_t[encrypted_size];
-			encrypted.serialize_out(encrypted_buffer, false);
+			uint8_t* key_buffer = new uint8_t[key_size];
 
-			const uint32_t output_len = encrypted_size;
-			std::vector<uint8_t> output_buffer(output_len);
+			for (auto i=0; i<encrypted_size; i++) {
+				encrypted_buffer[i] = encrypted[i]._v;
+			}
 
-			PREDA_CALL(Util_SM4Dec,encrypted_buffer, encrypted_size, key_buffer.data(), sm4_key_len, output_buffer.data(), output_len);
+			for (auto i=0; i<key_size; i++) {
+				key_buffer[i] = key[i]._v;
+			}
+
+			std::vector<uint8_t> output_buffer(encrypted_size);
+			uint32_t out_len = encrypted_size;
+
+			PREDA_CALL(Util_SM4Dec, encrypted_buffer, encrypted_size, key_buffer, key_size, output_buffer.data(), out_len);
 
 			__prlt_array<__prlt_uint8> ret;
-			for (uint32_t i = 0; i < output_len; ++i) {
+			for (uint32_t i = 0; i < out_len; ++i) {
 				ret.__prli_push(output_buffer[i]);
 			}
 
 			delete[] encrypted_buffer;
+			delete[] key_buffer;
 
 			return ret;
 		}
 
 		__prlt_array<__prlt_uint8> __prli_sm2_sign(__prlt_array<__prlt_uint8> data, __prlt_array<__prlt_uint8> private_key)
 		{
-			prlrt::serialize_size_type data_size = data.get_serialize_size();
-			prlrt::serialize_size_type key_size = private_key.get_serialize_size();
+			auto data_size = data.__prli_length()._v;
+			auto key_size = private_key.__prli_length()._v;
 
 			uint8_t* data_buffer = new uint8_t[data_size];
 			uint8_t* key_buffer = new uint8_t[key_size];
 
-			data.serialize_out(data_buffer, false);
-			private_key.serialize_out(key_buffer, false);
+			for (auto i=0; i<data_size; i++) {
+				data_buffer[i] = data[i]._v;
+			}
+
+			for (auto i=0; i<key_size; i++) {
+				key_buffer[i] = private_key[i]._v;
+			}
 
 			const uint32_t signature_len = 64;
 			std::vector<uint8_t> signature_buffer(signature_len);
@@ -359,17 +351,25 @@ namespace prlrt {
 
 		__prlt_bool __prli_sm2_verify(__prlt_array<__prlt_uint8> data, __prlt_array<__prlt_uint8> signed_data, __prlt_array<__prlt_uint8> public_key)
 		{
-			prlrt::serialize_size_type data_size = data.get_serialize_size();
-			prlrt::serialize_size_type signature_size = signed_data.get_serialize_size();
-			prlrt::serialize_size_type key_size = public_key.get_serialize_size();
+			auto data_size = data.__prli_length()._v;
+			auto signature_size = signed_data.__prli_length()._v;
+			auto key_size = public_key.__prli_length()._v;
 
 			uint8_t* data_buffer = new uint8_t[data_size];
 			uint8_t* signature_buffer = new uint8_t[signature_size];
 			uint8_t* key_buffer = new uint8_t[key_size];
 
-			data.serialize_out(data_buffer, false);
-			signed_data.serialize_out(signature_buffer, false);
-			public_key.serialize_out(key_buffer, false);
+			for (auto i=0; i<data_size; i++) {
+				data_buffer[i] = data[i]._v;
+			}
+
+			for (auto i=0; i<signature_size; i++) {
+				signature_buffer[i] = signed_data[i]._v;
+			}
+
+			for (auto i=0; i<key_size; i++) {
+				key_buffer[i] = public_key[i]._v;
+			}
 
 			bool result = PREDA_CALL(Util_SM2Verify, data_buffer, data_size, signature_buffer, signature_size, key_buffer, key_size);
 

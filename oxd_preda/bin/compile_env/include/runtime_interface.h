@@ -272,7 +272,7 @@ namespace prlrt {
 	V(void, Util_MD5, uint8_t* data, uint32_t data_len, uint8_t* out, uint32_t out_len)\
 	V(void, Util_SM3, uint8_t* data, uint32_t data_len, uint8_t* out, uint32_t out_len)\
 	V(void, Util_SM4Enc, uint8_t* data, uint32_t data_len, uint8_t* key, uint32_t key_len, uint8_t* out, uint32_t out_len)\
-	V(void, Util_SM4Dec, uint8_t* encrypted, uint32_t encrypted_len, uint8_t* key, uint32_t key_len, uint8_t* out, uint32_t out_len)\
+	V(void, Util_SM4Dec, uint8_t* encrypted, uint32_t encrypted_len, uint8_t* key, uint32_t key_len, uint8_t* out, uint32_t& out_len)\
 	V(void, Util_SM2Sign, uint8_t* data, uint32_t data_len, uint8_t* private_key,  uint32_t key_len, uint8_t* out, uint32_t out_len) \
 	V(bool, Util_SM2Verify, uint8_t* data, uint32_t data_len, uint8_t* signature, uint32_t signature_len, uint8_t* public_key, uint32_t key_len)
 
