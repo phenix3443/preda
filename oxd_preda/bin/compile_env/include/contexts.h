@@ -4,6 +4,10 @@
 #include "address_blob_hash_types.h"
 #include "arraytype.h"
 #include <iostream>
+#include <sstream>
+#include <iomanip>
+#include <stdexcept>
+#include <cctype>
 
 namespace prlrt {
 
@@ -196,187 +200,221 @@ prlrt::__prlt___debug __prli___debug;
 
 namespace prlrt {
 	struct __prlt__util {
+		uint8_t* __prlt_array_to_uint8(__prlt_array<__prlt_uint8>& data, size_t& out_size)
+		{
+			out_size = data.__prli_length()._v;
+			std::unique_ptr<uint8_t[]> buffer(new uint8_t[out_size]);
+			for (size_t i = 0; i < out_size; ++i) {
+				buffer[i] = data[i]._v;
+			}
+			return buffer.release();
+		}
+
+		__prlt_array<__prlt_uint8> vector_to_prlt_array(const std::vector<uint8_t>& input) 
+		{
+			__prlt_array<__prlt_uint8> result;
+			for (size_t i = 0; i < input.size(); ++i) {
+				result.__prli_push(input[i]);
+			}
+			return result;
+		}
+
+		std::string hex_encode(const std::vector<uint8_t>& input) 
+		{
+			std::stringstream ss;
+			ss << std::hex << std::setfill('0');
+			for (uint8_t i : input) {
+				ss << std::setw(2) << static_cast<int>(i);
+			}
+			return ss.str();
+		}
+
+		std::vector<uint8_t> hex_decode(const std::string& hex) 
+		{
+			if (hex.length() % 2 != 0) {
+				throw std::invalid_argument("Invalid hex string: length must be even.");
+			}
+
+			std::vector<uint8_t> bytes;
+			bytes.reserve(hex.length() / 2);
+
+			for (size_t i = 0; i < hex.length(); i += 2) {
+				std::string byteString = hex.substr(i, 2);
+				uint8_t byte = static_cast<uint8_t>(std::stoi(byteString, nullptr, 16));
+				bytes.push_back(byte);
+			}
+
+			return bytes;
+		}
+
 		__prlt_array<__prlt_uint8> __prli_sha3(__prlt_array<__prlt_uint8> data)
 		{
-			prlrt::serialize_size_type s = data.get_serialize_size();
-			uint8_t *buffer = new uint8_t[s];
-			data.serialize_out(buffer, false);
+			size_t data_size;
+   			std::unique_ptr<uint8_t[]> data_buffer(__prlt_array_to_uint8(data, data_size));
+			const uint32_t sha3_output_len = 32; 
+			std::vector<uint8_t> output_buffer(sha3_output_len);
+			PREDA_CALL(Util_SHA3, data_buffer.get(), data_size, output_buffer.data(), sha3_output_len);
+			return vector_to_prlt_array(output_buffer);
+		
+		}
 
+		__prlt_string __prli_sha3(__prlt_string data)
+		{
 			const uint32_t sha3_output_len = 32; 
 			std::vector<uint8_t> output_buffer(sha3_output_len);
 
-			PREDA_CALL(Util_SHA3, buffer, s, output_buffer.data(), sha3_output_len);
+			PREDA_CALL(Util_SHA3, reinterpret_cast<const uint8_t*>(data.ptr->str.c_str()) , data.ptr->str.length(), 
+			output_buffer.data(), sha3_output_len);
 
-			__prlt_array<__prlt_uint8> ret;
-			for (uint32_t i = 0; i < sha3_output_len; ++i) {
-        		ret.__prli_push(output_buffer[i]);
-    		}
-			delete [] buffer;
+			auto ret = __prlt_string();
+			ret.ptr->str = hex_encode(output_buffer);
 			return ret;
 		}
 
 		__prlt_array<__prlt_uint8> __prli_md5(__prlt_array<__prlt_uint8> data)
 		{
-			prlrt::serialize_size_type s = data.get_serialize_size();
-			uint8_t *buffer = new uint8_t[s];
-			data.serialize_out(buffer, false);
-
+			size_t data_size;
+   			std::unique_ptr<uint8_t[]> data_buffer(__prlt_array_to_uint8(data, data_size));
 			const uint32_t output_len = 16; 
 			std::vector<uint8_t> output_buffer(output_len);
 
-			PREDA_CALL(Util_MD5, buffer, s,  output_buffer.data(), output_len);
-
-			__prlt_array<__prlt_uint8> ret;
-			for (uint32_t i = 0; i < output_len; ++i) {
-				ret.__prli_push(output_buffer[i]);
-			}
-			delete[] buffer;
+			PREDA_CALL(Util_MD5, data_buffer.get(), data_size,  output_buffer.data(), output_len);
+			return vector_to_prlt_array(output_buffer);
+		}
+		
+		__prlt_string __prli_md5(__prlt_string data)
+		{
+			const uint32_t output_len = 16; 
+			std::vector<uint8_t> output_buffer(output_len);
+			PREDA_CALL(Util_MD5, reinterpret_cast<const uint8_t*>(data.ptr->str.c_str()), data.ptr->str.length(),  output_buffer.data(), output_len);
+			auto ret = __prlt_string();
+			ret.ptr->str = hex_encode(output_buffer);
 			return ret;
 		}
 
 		__prlt_array<__prlt_uint8> __prli_sm3(__prlt_array<__prlt_uint8> data)
 		{
-			prlrt::serialize_size_type s = data.get_serialize_size();
-			uint8_t *buffer = new uint8_t[s];
-			data.serialize_out(buffer, false);
-
+			size_t data_size;
+   			std::unique_ptr<uint8_t[]> data_buffer(__prlt_array_to_uint8(data, data_size));
 			const uint32_t output_len = 32; 
 			std::vector<uint8_t> output_buffer(output_len);
+			PREDA_CALL(Util_SM3, data_buffer.get(), data_size,  output_buffer.data(), output_len);
+			return vector_to_prlt_array(output_buffer);
+		}
 
-			PREDA_CALL(Util_SM3,buffer, s,  output_buffer.data(), output_len);
-			__prlt_array<__prlt_uint8> ret;
-			for (uint32_t i = 0; i < output_len; ++i) {
-				ret.__prli_push(output_buffer[i]);
-			}
-			delete[] buffer;
+		__prlt_string __prli_sm3(__prlt_string data)
+		{
+			const uint32_t output_len = 32; 
+			std::vector<uint8_t> output_buffer(output_len);
+			PREDA_CALL(Util_SM3,reinterpret_cast<const uint8_t*>(data.ptr->str.c_str()), data.ptr->str.length(),
+			 output_buffer.data(), output_len);
+			auto ret = __prlt_string();
+			ret.ptr->str = hex_encode(output_buffer);
 			return ret;
 		}
 
 		__prlt_array<__prlt_uint8> __prli_sm4_enc(__prlt_array<__prlt_uint8> data, __prlt_array<__prlt_uint8> key)
 		{
-			auto data_size = data.__prli_length()._v;
-			auto key_size = key.__prli_length()._v;
-		
-			uint8_t* data_buffer = new uint8_t[data_size];
-			uint8_t* key_buffer = new uint8_t[key_size];
-
-			for (auto i=0; i<data_size; i++) {
-				data_buffer[i] = data[i]._v;
-			}
-
-			for (auto i=0; i<key_size; i++) {
-				key_buffer[i] = key[i]._v;
-			}
+			size_t data_size;
+   			std::unique_ptr<uint8_t[]> data_buffer(__prlt_array_to_uint8(data, data_size));
+			size_t key_size;
+   			std::unique_ptr<uint8_t[]> key_buffer(__prlt_array_to_uint8(key, key_size));
 
 			const uint32_t block_size = 16;
 			uint32_t padded_len = data_size + (block_size - (data_size % 16));
 			std::vector<uint8_t> output_buffer(padded_len);
+			PREDA_CALL(Util_SM4Enc, data_buffer.get(), data_size, key_buffer.get(), key_size, output_buffer.data(), padded_len);
+			return vector_to_prlt_array(output_buffer);
+		}
 
-			PREDA_CALL(Util_SM4Enc, data_buffer, data_size, key_buffer, key_size, output_buffer.data(), padded_len);
+		__prlt_string __prli_sm4_enc(__prlt_string data, __prlt_string key)
+		{
+			auto data_size = data.ptr->str.length();
+			const uint32_t block_size = 16;
+			uint32_t padded_len = data_size + (block_size - (data_size % 16));
+			std::vector<uint8_t> output_buffer(padded_len);
 
-			__prlt_array<__prlt_uint8> ret;
-			for (uint32_t i = 0; i < padded_len; ++i) {
-				ret.__prli_push(output_buffer[i]);
-			}
+			PREDA_CALL(Util_SM4Enc, reinterpret_cast<const uint8_t*>(data.ptr->str.c_str()), data_size,
+			reinterpret_cast<const uint8_t*>(key.ptr->str.c_str()), key.ptr->str.length(), output_buffer.data(), padded_len);
 
-			delete[] data_buffer;
-			delete[] key_buffer;
-
+			auto ret = __prlt_string();
+			ret.ptr->str = hex_encode(output_buffer);
 			return ret;
 		}
 
 		__prlt_array<__prlt_uint8> __prli_sm4_dec(__prlt_array<__prlt_uint8> encrypted, __prlt_array<__prlt_uint8> key)
 		{
-			auto encrypted_size = encrypted.__prli_length()._v;
-			auto key_size = key.__prli_length()._v;
+			size_t encrypted_size;
+   			std::unique_ptr<uint8_t[]> encrypted_buffer(__prlt_array_to_uint8(encrypted, encrypted_size));
+			size_t key_size;
+   			std::unique_ptr<uint8_t[]> key_buffer(__prlt_array_to_uint8(key, key_size));
 
-			uint8_t* encrypted_buffer = new uint8_t[encrypted_size];
-			uint8_t* key_buffer = new uint8_t[key_size];
+			std::vector<uint8_t> output_buffer(encrypted_size);
+			uint32_t out_len;
 
-			for (auto i=0; i<encrypted_size; i++) {
-				encrypted_buffer[i] = encrypted[i]._v;
-			}
+			PREDA_CALL(Util_SM4Dec, reinterpret_cast<const uint8_t*>(encrypted_buffer.get()), encrypted_size, 
+			key_buffer.get(), key_size, output_buffer.data(), out_len);
+			output_buffer.resize(out_len);
+			return vector_to_prlt_array(output_buffer);
+		}
 
-			for (auto i=0; i<key_size; i++) {
-				key_buffer[i] = key[i]._v;
-			}
-
+		__prlt_string __prli_sm4_dec(__prlt_string encrypted, __prlt_string key)
+		{
+			auto encrypted_v = hex_decode(encrypted.ptr->str);
+			auto encrypted_size = encrypted_v.size();
 			std::vector<uint8_t> output_buffer(encrypted_size);
 			uint32_t out_len = encrypted_size;
 
-			PREDA_CALL(Util_SM4Dec, encrypted_buffer, encrypted_size, key_buffer, key_size, output_buffer.data(), out_len);
-
-			__prlt_array<__prlt_uint8> ret;
-			for (uint32_t i = 0; i < out_len; ++i) {
-				ret.__prli_push(output_buffer[i]);
-			}
-
-			delete[] encrypted_buffer;
-			delete[] key_buffer;
-
+			PREDA_CALL(Util_SM4Dec, reinterpret_cast<const uint8_t*>(encrypted_v.data()), encrypted_size, 
+			reinterpret_cast<const uint8_t*>(key.ptr->str.c_str()), key.ptr->str.length(), output_buffer.data(), out_len);
+			output_buffer.resize(out_len);
+			auto ret = __prlt_string();
+			ret.ptr->str = std::string(output_buffer.begin(), output_buffer.end());
 			return ret;
 		}
 
 		__prlt_array<__prlt_uint8> __prli_sm2_sign(__prlt_array<__prlt_uint8> data, __prlt_array<__prlt_uint8> private_key)
 		{
-			auto data_size = data.__prli_length()._v;
-			auto key_size = private_key.__prli_length()._v;
-
-			uint8_t* data_buffer = new uint8_t[data_size];
-			uint8_t* key_buffer = new uint8_t[key_size];
-
-			for (auto i=0; i<data_size; i++) {
-				data_buffer[i] = data[i]._v;
-			}
-
-			for (auto i=0; i<key_size; i++) {
-				key_buffer[i] = private_key[i]._v;
-			}
+			size_t data_size;
+   			std::unique_ptr<uint8_t[]> data_buffer(__prlt_array_to_uint8(data, data_size));
+			size_t key_size;
+   			std::unique_ptr<uint8_t[]> key_buffer(__prlt_array_to_uint8(private_key, key_size));
 
 			const uint32_t signature_len = 64;
 			std::vector<uint8_t> signature_buffer(signature_len);
+			PREDA_CALL(Util_SM2Sign, data_buffer.get(), data_size, key_buffer.get(), key_size, signature_buffer.data(), signature_len);
+			return vector_to_prlt_array(signature_buffer);
+		}
 
-			PREDA_CALL(Util_SM2Sign, data_buffer, data_size, key_buffer, key_size, signature_buffer.data(), signature_len);
-
-			__prlt_array<__prlt_uint8> ret;
-			for (uint32_t i = 0; i < signature_len; ++i) {
-				ret.__prli_push(signature_buffer[i]);
-			}
-
-			delete[] data_buffer;
-			delete[] key_buffer;
-
+		__prlt_string __prli_sm2_sign(__prlt_string data, __prlt_string private_key)
+		{
+			const uint32_t signature_len = 64;
+			std::vector<uint8_t> signature_buffer(signature_len);
+			PREDA_CALL(Util_SM2Sign, reinterpret_cast<const uint8_t*>(data.ptr->str.c_str()), data.ptr->str.length(),
+			reinterpret_cast<const uint8_t*>(private_key.ptr->str.c_str()), private_key.ptr->str.length(),
+			 signature_buffer.data(), signature_len);
+			auto ret = __prlt_string();
+			ret.ptr->str = std::string(signature_buffer.begin(),signature_buffer.end());
 			return ret;
 		}
 
-		__prlt_bool __prli_sm2_verify(__prlt_array<__prlt_uint8> data, __prlt_array<__prlt_uint8> signed_data, __prlt_array<__prlt_uint8> public_key)
+		__prlt_bool __prli_sm2_verify(__prlt_array<__prlt_uint8> data, __prlt_array<__prlt_uint8> signature, __prlt_array<__prlt_uint8> public_key)
 		{
-			auto data_size = data.__prli_length()._v;
-			auto signature_size = signed_data.__prli_length()._v;
-			auto key_size = public_key.__prli_length()._v;
+			size_t data_size;
+   			std::unique_ptr<uint8_t[]> data_buffer(__prlt_array_to_uint8(data, data_size));
+			size_t signature_size;
+   			std::unique_ptr<uint8_t[]> signature_buffer( __prlt_array_to_uint8(signature, signature_size));
+			size_t key_size;
+   			std::unique_ptr<uint8_t[]> key_buffer(__prlt_array_to_uint8(public_key, key_size));
+			bool result = PREDA_CALL(Util_SM2Verify, data_buffer.get(), data_size, signature_buffer.get(), signature_size, key_buffer.get(), key_size);
+			return result ? __prlt_bool(true) : __prlt_bool(false);
+		}
 
-			uint8_t* data_buffer = new uint8_t[data_size];
-			uint8_t* signature_buffer = new uint8_t[signature_size];
-			uint8_t* key_buffer = new uint8_t[key_size];
-
-			for (auto i=0; i<data_size; i++) {
-				data_buffer[i] = data[i]._v;
-			}
-
-			for (auto i=0; i<signature_size; i++) {
-				signature_buffer[i] = signed_data[i]._v;
-			}
-
-			for (auto i=0; i<key_size; i++) {
-				key_buffer[i] = public_key[i]._v;
-			}
-
-			bool result = PREDA_CALL(Util_SM2Verify, data_buffer, data_size, signature_buffer, signature_size, key_buffer, key_size);
-
-			delete[] data_buffer;
-			delete[] signature_buffer;
-			delete[] key_buffer;
-
+		__prlt_bool __prli_sm2_verify(__prlt_string data, __prlt_string signature, __prlt_string public_key)
+		{
+			bool result = PREDA_CALL(Util_SM2Verify, reinterpret_cast<const uint8_t*>(data.ptr->str.c_str()), data.ptr->str.length(),
+			 reinterpret_cast<const uint8_t*>(signature.ptr->str.c_str()), signature.ptr->str.length(),
+			  reinterpret_cast<const uint8_t*>(public_key.ptr->str.c_str()), public_key.ptr->str.length());
 			return result ? __prlt_bool(true) : __prlt_bool(false);
 		}
 	};

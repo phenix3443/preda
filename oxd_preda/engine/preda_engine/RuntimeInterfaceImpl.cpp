@@ -902,7 +902,7 @@ void CRuntimeInterface::Event_Exception(const char* msg, prlrt::ExceptionType ex
 }
 
 
-void CRuntimeInterface::Util_SHA3(uint8_t* data, uint32_t data_len, uint8_t* out, uint32_t out_len)
+void CRuntimeInterface::Util_SHA3(const uint8_t* data, uint32_t data_len, uint8_t* out, uint32_t out_len)
 {
 	std::unique_ptr<Botan::HashFunction> hash(Botan::HashFunction::create("SHA-3(256)"));
 	if(!hash) {
@@ -920,7 +920,7 @@ void CRuntimeInterface::Util_SHA3(uint8_t* data, uint32_t data_len, uint8_t* out
 	return ;
 }
 
-void CRuntimeInterface::Util_MD5(uint8_t* data, uint32_t data_len, uint8_t* out, uint32_t out_len)
+void CRuntimeInterface::Util_MD5(const uint8_t* data, uint32_t data_len, uint8_t* out, uint32_t out_len)
 {
 	std::unique_ptr<Botan::HashFunction> hash_fn(Botan::HashFunction::create("MD5"));
     if (!hash_fn) {
@@ -934,7 +934,7 @@ void CRuntimeInterface::Util_MD5(uint8_t* data, uint32_t data_len, uint8_t* out,
     std::copy(hash_output.begin(), hash_output.end(), out);
 }
 
-void CRuntimeInterface::Util_SM3(uint8_t* data, uint32_t data_len, uint8_t* out, uint32_t out_len)
+void CRuntimeInterface::Util_SM3(const uint8_t* data, uint32_t data_len, uint8_t* out, uint32_t out_len)
 {
 	std::unique_ptr<Botan::HashFunction> hash_fn(Botan::HashFunction::create("SM3"));
     if (!hash_fn) {
@@ -948,7 +948,7 @@ void CRuntimeInterface::Util_SM3(uint8_t* data, uint32_t data_len, uint8_t* out,
     std::copy(hash_output.begin(), hash_output.end(), out);
 }
 
-void CRuntimeInterface::Util_SM4Enc(uint8_t* data, uint32_t data_len, uint8_t* key, uint32_t key_len, uint8_t* out, uint32_t out_len)
+void CRuntimeInterface::Util_SM4Enc(const uint8_t* data, uint32_t data_len, const uint8_t* key, uint32_t key_len, uint8_t* out, uint32_t out_len)
 {
 	const uint32_t block_size = 16;
 
@@ -977,7 +977,7 @@ void CRuntimeInterface::Util_SM4Enc(uint8_t* data, uint32_t data_len, uint8_t* k
     }
 }
 
-void CRuntimeInterface::Util_SM4Dec(uint8_t* encrypted, uint32_t encrypted_len, uint8_t* key, uint32_t key_len, uint8_t* out, uint32_t& out_len)
+void CRuntimeInterface::Util_SM4Dec(const uint8_t* encrypted, uint32_t encrypted_len, const uint8_t* key, uint32_t key_len, uint8_t* out, uint32_t& out_len)
 {
 	const uint32_t block_size = 16;
 
@@ -1017,36 +1017,42 @@ void CRuntimeInterface::Util_SM4Dec(uint8_t* encrypted, uint32_t encrypted_len, 
 }
 
 
-void CRuntimeInterface::Util_SM2Sign(uint8_t* data, uint32_t data_len, uint8_t* private_key,  uint32_t key_len, uint8_t* out, uint32_t out_len)
-{ 
-	if (out_len < 64) {
+void CRuntimeInterface::Util_SM2Sign(const uint8_t* data, uint32_t data_len, const uint8_t* private_key, uint32_t key_len, uint8_t* out, uint32_t out_len) {
+    if (out_len < 64) {  
         throw std::runtime_error("Output buffer too small for SM2 signature");
     }
 
-    Botan::AutoSeeded_RNG rng;
-    Botan::DataSource_Memory key_data(private_key, key_len);
-    std::unique_ptr<Botan::Private_Key> priv_key(Botan::PKCS8::load_key(key_data, rng));
-    if (!priv_key) {
-        throw std::runtime_error("Failed to load private key");
+    try {
+        Botan::AutoSeeded_RNG rng;
+        Botan::DataSource_Memory key_data(private_key, key_len);
+        std::unique_ptr<Botan::Private_Key> priv_key(Botan::PKCS8::load_key(key_data, rng));
+
+        if (!priv_key) {
+            throw std::runtime_error("Failed to load private key");
+        }
+
+        Botan::SM2_PrivateKey* sm2_key = dynamic_cast<Botan::SM2_PrivateKey*>(priv_key.get());
+        if (!sm2_key) {
+            throw std::runtime_error("Loaded key is not an SM2 private key");
+        }
+
+        Botan::PK_Signer signer(*sm2_key, rng, "EMSA1(SM3)");
+        signer.update(data, data_len);
+        std::vector<uint8_t> signature = signer.signature(rng);
+
+        if (signature.size() > out_len) {
+            throw std::runtime_error("Output buffer too small for SM2 signature");
+        }
+
+        std::copy(signature.begin(), signature.end(), out);
+    } catch (const Botan::Exception& e) {
+        std::cerr << "Botan library exception: " << e.what() << std::endl;
+        throw std::runtime_error("Botan library error occurred");
     }
-
-    Botan::SM2_PrivateKey* sm2_key = dynamic_cast<Botan::SM2_PrivateKey*>(priv_key.get());
-    if (!sm2_key) {
-        throw std::runtime_error("Loaded key is not an SM2 private key");
-    }
-    Botan::PK_Signer signer(*sm2_key, rng, "EMSA1(SM3)");
-
-    signer.update(data, data_len);
-    std::vector<uint8_t> signature = signer.signature(rng);
-
-    if (signature.size() > out_len) {
-        throw std::runtime_error("Output buffer too small for SM2 signature");
-    }
-
-    std::copy(signature.begin(), signature.end(), out);
 }
 
-bool CRuntimeInterface::Util_SM2Verify(uint8_t* data, uint32_t data_len, uint8_t* signature, uint32_t signature_len, uint8_t* public_key, uint32_t key_len)
+
+bool CRuntimeInterface::Util_SM2Verify(const uint8_t* data, uint32_t data_len, const uint8_t* signature, uint32_t signature_len, const uint8_t* public_key, uint32_t key_len)
 { 
 	Botan::AutoSeeded_RNG rng;
 

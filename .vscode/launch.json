@@ -73,6 +73,20 @@
       "cwd": "${workspaceFolder}/oxd_preda/bin/bin_debug/",
       "environment": [],
       "MIMode": "lldb"
+    },
+    {
+      "name": "debug encrypt2 contract on windows",
+      "type": "cppvsdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/oxd_preda/bin/bin_debug/chsimu.exe",
+      "args": [
+        "${workspaceFolder}/oxd_preda/transpiler/testcase/encrypt2.prdts",
+        "-count:4",
+        "-stdout"
+      ],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}/oxd_preda/bin/bin_debug/",
+      "environment": []
     }
   ]
 }

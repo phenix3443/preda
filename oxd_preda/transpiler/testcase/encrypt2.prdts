@@ -2,18 +2,19 @@ random.reseed
 allocate.address 1024
 chain.gaslimit 256
 
-chain.deploy @1 encrypt.prd
+chain.deploy @1 encrypt2.prd
 
 log.highlight Encrypt test
 
 log Perparing init test data
-state.set global.Encrypt {m:[1], pk:[2], puk:[3]}
+state.set global.Encrypt {m:"hello,world", pk:"private_key", puk:"public_key"}
 
 txn1[] = Encrypt.testSHA3 #global {}
 txn2[] = Encrypt.testMD5 #global {}
 txn3[] = Encrypt.testSM3 #global {}
 txn4[] = Encrypt.testSM4 #global {}
 // txn5[] = Encrypt.TestSM2 #global {}
+
 
 chain.info
 
