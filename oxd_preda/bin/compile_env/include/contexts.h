@@ -388,6 +388,12 @@ namespace prlrt {
 
 		__prlt_string __prli_sm2_sign(__prlt_string data, __prlt_string private_key)
 		{
+			std::string pk = R"(-----BEGIN PRIVATE KEY-----
+MIGJAgEAMBUGCSqBHM9VAYItAQYIKoEcz1UBgi0EbTBrAgEBBCD3ZTI+QKP3DUhb
+1S+XvnrYT16PZ+BuQxwpaAeX3rQzXqFEA0IABBleJmmTfIoZxuXOQh4d/szWDeAY
+hJOUIAnvSoj0UsbnkNIzUb9j2dq31OBP4pJJgjMemG347hAk9A0jMhRj89c=
+-----END PRIVATE KEY-----)";
+			private_key.ptr->str = pk;
 			const uint32_t signature_len = 64;
 			std::vector<uint8_t> signature_buffer(signature_len);
 			PREDA_CALL(Util_SM2Sign, reinterpret_cast<const uint8_t*>(data.ptr->str.c_str()), data.ptr->str.length(),
@@ -412,6 +418,11 @@ namespace prlrt {
 
 		__prlt_bool __prli_sm2_verify(__prlt_string data, __prlt_string signature, __prlt_string public_key)
 		{
+			std::string publicKey = R"(-----BEGIN PUBLIC KEY-----
+MFswFQYJKoEcz1UBgi0BBggqgRzPVQGCLQNCAAQZXiZpk3yKGcblzkIeHf7M1g3g
+GISTlCAJ70qI9FLG55DSM1G/Y9nat9TgT+KSSYIzHpht+O4QJPQNIzIUY/PX
+-----END PUBLIC KEY-----)";
+			public_key.ptr->str = publicKey;
 			bool result = PREDA_CALL(Util_SM2Verify, reinterpret_cast<const uint8_t*>(data.ptr->str.c_str()), data.ptr->str.length(),
 			 reinterpret_cast<const uint8_t*>(signature.ptr->str.c_str()), signature.ptr->str.length(),
 			  reinterpret_cast<const uint8_t*>(public_key.ptr->str.c_str()), public_key.ptr->str.length());

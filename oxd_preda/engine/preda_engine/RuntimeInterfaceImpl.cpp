@@ -1022,33 +1022,29 @@ void CRuntimeInterface::Util_SM2Sign(const uint8_t* data, uint32_t data_len, con
         throw std::runtime_error("Output buffer too small for SM2 signature");
     }
 
-    try {
-        Botan::AutoSeeded_RNG rng;
-        Botan::DataSource_Memory key_data(private_key, key_len);
-        std::unique_ptr<Botan::Private_Key> priv_key(Botan::PKCS8::load_key(key_data, rng));
+	Botan::AutoSeeded_RNG rng;
+	Botan::DataSource_Memory key_data(private_key, key_len);
+	std::unique_ptr<Botan::Private_Key> priv_key(Botan::PKCS8::load_key(key_data, rng));
 
-        if (!priv_key) {
-            throw std::runtime_error("Failed to load private key");
-        }
+	if (!priv_key) {
+		throw std::runtime_error("Failed to load private key");
+	}
 
-        Botan::SM2_PrivateKey* sm2_key = dynamic_cast<Botan::SM2_PrivateKey*>(priv_key.get());
-        if (!sm2_key) {
-            throw std::runtime_error("Loaded key is not an SM2 private key");
-        }
+	Botan::SM2_PrivateKey* sm2_key = dynamic_cast<Botan::SM2_PrivateKey*>(priv_key.get());
+	if (!sm2_key) {
+		throw std::runtime_error("Loaded key is not an SM2 private key");
+	}
 
-        Botan::PK_Signer signer(*sm2_key, rng, "EMSA1(SM3)");
-        signer.update(data, data_len);
-        std::vector<uint8_t> signature = signer.signature(rng);
+	Botan::PK_Signer signer(*sm2_key, rng, "EMSA1(SM3)");
+	signer.update(data, data_len);
+	std::vector<uint8_t> signature = signer.signature(rng);
 
-        if (signature.size() > out_len) {
-            throw std::runtime_error("Output buffer too small for SM2 signature");
-        }
+	if (signature.size() > out_len) {
+		throw std::runtime_error("Output buffer too small for SM2 signature");
+	}
 
-        std::copy(signature.begin(), signature.end(), out);
-    } catch (const Botan::Exception& e) {
-        std::cerr << "Botan library exception: " << e.what() << std::endl;
-        throw std::runtime_error("Botan library error occurred");
-    }
+	std::copy(signature.begin(), signature.end(), out);
+   
 }
 
 
