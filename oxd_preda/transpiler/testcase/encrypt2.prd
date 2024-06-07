@@ -28,6 +28,7 @@ contract Encrypt{
 	}
 
 	function TestSM2() export{
+		// __debug.print("testSM2: ", pk, "\n", puk);
 		const string sign = __util.sm2_sign(m, pk);
 		__debug.assert(__util.sm2_verify(m, sign, puk), "verify failed");
 	}
