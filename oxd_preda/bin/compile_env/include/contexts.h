@@ -200,6 +200,53 @@ prlrt::__prlt___debug __prli___debug;
 
 namespace prlrt {
 	struct __prlt__util {
+		__prlt_array<__prlt_uint8> __prli_string_to_array(__prlt_string& data)
+		{
+			__prlt_array<__prlt_uint8> result;
+			for (size_t i = 0; i < data.ptr->str.length(); ++i) {
+				result.__prli_push(data.ptr->str[i]);
+			}
+			return result;
+		}
+
+		__prlt_string __prli_array_to_string(__prlt_array<__prlt_uint8>& data)
+		{
+			__prlt_string result;
+			for (size_t i = 0; i < data.__prli_length()._v; ++i) {
+				result.ptr->str += data[i]._v;
+			}
+			return result;
+		}
+
+		__prlt_string __prli_hex_encode(const __prlt_array<__prlt_uint8>& input) 
+		{
+			std::stringstream ss;
+			ss << std::hex << std::setfill('0');
+			for (auto i : input.ptr->v) {
+				ss << std::setw(2) << static_cast<int>(i._v);
+			}
+			__prlt_string result;
+			result.ptr->str = ss.str();
+			return result;
+		}
+
+		__prlt_array<__prlt_uint8> __prli_hex_decode(const __prlt_string& hex) 
+		{
+			auto length = hex.ptr->str.length();
+			if (length % 2 != 0) {
+				throw std::invalid_argument("Invalid hex string: length must be even.");
+			}
+
+			__prlt_array<__prlt_uint8> bytes;
+			bytes.ptr->set_length(length / 2);
+			for (size_t i = 0; i < length; i += 2) {
+				std::string byteString = hex.ptr->str.substr(i, 2);
+				uint8_t byte = static_cast<uint8_t>(std::stoi(byteString, nullptr, 16));
+				bytes.__prli_push(byte);
+			}
+			return bytes;
+		}
+
 		uint8_t* __prlt_array_to_uint8(__prlt_array<__prlt_uint8>& data, size_t& out_size)
 		{
 			out_size = data.__prli_length()._v;
@@ -217,35 +264,7 @@ namespace prlrt {
 				result.__prli_push(input[i]);
 			}
 			return result;
-		}
-
-		std::string hex_encode(const std::vector<uint8_t>& input) 
-		{
-			std::stringstream ss;
-			ss << std::hex << std::setfill('0');
-			for (uint8_t i : input) {
-				ss << std::setw(2) << static_cast<int>(i);
-			}
-			return ss.str();
-		}
-
-		std::vector<uint8_t> hex_decode(const std::string& hex) 
-		{
-			if (hex.length() % 2 != 0) {
-				throw std::invalid_argument("Invalid hex string: length must be even.");
-			}
-
-			std::vector<uint8_t> bytes;
-			bytes.reserve(hex.length() / 2);
-
-			for (size_t i = 0; i < hex.length(); i += 2) {
-				std::string byteString = hex.substr(i, 2);
-				uint8_t byte = static_cast<uint8_t>(std::stoi(byteString, nullptr, 16));
-				bytes.push_back(byte);
-			}
-
-			return bytes;
-		}
+		}		
 
 		__prlt_array<__prlt_uint8> __prli_sha3(__prlt_array<__prlt_uint8> data)
 		{

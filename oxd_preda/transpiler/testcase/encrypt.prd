@@ -1,33 +1,34 @@
 
 contract Encrypt{
-	@global array<uint8> m;	
+	@global string m;	
 	@global array<uint8> pk;
 	@global array<uint8> puk;
 
 
 	function testSHA3() export {
-		const array<uint8> hashed = __util.sha3(m);
-		__debug.print(hashed);
+		const array<uint8> hashed = __util.sha3(__util.string_to_array(m));
+		__debug.print("testSHA3: ", __util.hex_encode(hashed));
 	}
 
 	function testMD5() export{
-		const array<uint8> hashed = __util.md5(m);
-		__debug.print(hashed);
+		const array<uint8> hashed = __util.md5(__util.string_to_array(m));
+		__debug.print("testMD5: ", __util.hex_encode(hashed));
 	}
 
 	function testSM3() export{
-		const array<uint8> hashed = __util.sm3(m);
-		__debug.print(hashed);
+		const array<uint8> hashed = __util.sm3(__util.string_to_array(m));
+		__debug.print("testSM3: ", __util.hex_encode(hashed));
+		__debug.print(__util.hex_decode(__util.hex_encode(hashed)));
 	}
 	
 	function testSM4() export{
-		const array<uint8> encrypted = __util.sm4_enc(m, pk);
+		const array<uint8> encrypted = __util.sm4_enc(__util.string_to_array(m), pk);
 		const array<uint8> decrypted = __util.sm4_dec(encrypted, pk);
-		__debug.assert(m[uint32(0)]==decrypted[uint32(0)], "data != decrypted");
+		__debug.assert(m==__util.array_to_string(decrypted), "data != decrypted");
 	}
 
 	function TestSM2() export{
-		const array<uint8> sign = __util.sm2_sign(m, pk);
-		__debug.assert(__util.sm2_verify(m, sign, puk), "verify failed");
+		const array<uint8> sign = __util.sm2_sign(__util.string_to_array(m), pk);
+		__debug.assert(__util.sm2_verify(__util.string_to_array(m), sign, puk), "verify failed");
 	}
 }

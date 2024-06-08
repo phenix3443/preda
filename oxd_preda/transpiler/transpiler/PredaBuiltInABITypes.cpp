@@ -266,6 +266,38 @@ namespace transpiler {
 				FunctionSignature signature;
 				signature.flags = uint32_t(FunctionFlags::IsConst);
 				signature.returnType = QualifiedConcreteType(arrayOfUint8Type, true, false);
+				signature.parameters.push_back(Allocator::New<DefinedIdentifier>(pTranspilerContext->GetBuiltInStringType(), true, true, "data", 0));
+				res = res && (DefineMemberFunction("string_to_array", signature, false) != nullptr);
+			}
+			
+			{
+				FunctionSignature signature;
+				signature.flags = uint32_t(FunctionFlags::IsConst);
+				signature.returnType = QualifiedConcreteType(pTranspilerContext->GetBuiltInStringType(), true, false);
+				signature.parameters.push_back(Allocator::New<DefinedIdentifier>(arrayOfUint8Type, true, true, "data", 0));
+				res = res && (DefineMemberFunction("array_to_string", signature, false) != nullptr);
+			}
+
+			{
+				FunctionSignature signature;
+				signature.flags = uint32_t(FunctionFlags::IsConst);
+				signature.returnType = QualifiedConcreteType(pTranspilerContext->GetBuiltInStringType(), true, false);
+				signature.parameters.push_back(Allocator::New<DefinedIdentifier>(arrayOfUint8Type, true, true, "data", 0));
+				res = res && (DefineMemberFunction("hex_encode", signature, false) != nullptr);
+			}
+
+			{
+				FunctionSignature signature;
+				signature.flags = uint32_t(FunctionFlags::IsConst);
+				signature.returnType = QualifiedConcreteType(arrayOfUint8Type, true, false);
+				signature.parameters.push_back(Allocator::New<DefinedIdentifier>(pTranspilerContext->GetBuiltInStringType(), true, true, "data", 0));
+				res = res && (DefineMemberFunction("hex_decode", signature, false) != nullptr);
+			}
+
+			{
+				FunctionSignature signature;
+				signature.flags = uint32_t(FunctionFlags::IsConst);
+				signature.returnType = QualifiedConcreteType(arrayOfUint8Type, true, false);
 				signature.parameters.push_back(Allocator::New<DefinedIdentifier>(arrayOfUint8Type, true, true, "data", 0));
 				res = res && (DefineMemberFunction("sha3", signature, false) != nullptr);
 			}
