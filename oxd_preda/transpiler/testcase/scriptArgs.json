@@ -1,4 +1,3 @@
 {
-  "encrypt.prdts": "-count:4 -WASM",
-  "encrypt2.prdts": "-count:10"
+  "encrypt.prdts": "-count:4 -WASM"
 }

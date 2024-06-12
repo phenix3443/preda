@@ -904,7 +904,7 @@ std::optional<wasmtime::Linker> WASMRuntime::CreateBaseLinker(CExecutionEngine& 
 		return {};
 	}
 	
-	if (!linker.func_wrap("env", "Util_SM4Enc",
+	if (!linker.func_wrap("env", "predaUtil_SM4Enc",
 		[&engine](wasmtime::Caller caller, WasmPtrT data_offset, uint32_t data_len, WasmPtrT key_offset, uint32_t key_len,  WasmPtrT out_offset, uint32_t out_len) -> void {
 			wasmtime::Span<uint8_t> mem = engine.wasm_runtime()->memory().data(caller.context());
 			const uint8_t* data = WasmPtrToPtr<const uint8_t*>(mem, data_offset);
@@ -915,7 +915,7 @@ std::optional<wasmtime::Linker> WASMRuntime::CreateBaseLinker(CExecutionEngine& 
 		return {};
 	}
 
-	if (!linker.func_wrap("env", "Util_SM4Dec",
+	if (!linker.func_wrap("env", "predaUtil_SM4Dec",
 		[&engine](wasmtime::Caller caller, WasmPtrT data_offset, uint32_t data_len, WasmPtrT key_offset, uint32_t key_len,  WasmPtrT out_offset, uint32_t out_len) -> void {
 			wasmtime::Span<uint8_t> mem = engine.wasm_runtime()->memory().data(caller.context());
 			const uint8_t* data = WasmPtrToPtr<const uint8_t*>(mem, data_offset);
@@ -926,7 +926,7 @@ std::optional<wasmtime::Linker> WASMRuntime::CreateBaseLinker(CExecutionEngine& 
 		return {};
 	}
 
-	if (!linker.func_wrap("env", "Util_SM2Sign",
+	if (!linker.func_wrap("env", "predaUtil_SM2Sign",
 		[&engine](wasmtime::Caller caller, WasmPtrT data_offset, uint32_t data_len, WasmPtrT key_offset, uint32_t key_len,  WasmPtrT out_offset, uint32_t out_len) -> void {
 			wasmtime::Span<uint8_t> mem = engine.wasm_runtime()->memory().data(caller.context());
 			const uint8_t* data = WasmPtrToPtr<const uint8_t*>(mem, data_offset);
@@ -937,7 +937,7 @@ std::optional<wasmtime::Linker> WASMRuntime::CreateBaseLinker(CExecutionEngine& 
 		return {};
 	}
 
-	if (!linker.func_wrap("env", "Util_SM2Verify",
+	if (!linker.func_wrap("env", "predaUtil_SM2Verify",
 		[&engine](wasmtime::Caller caller, WasmPtrT data_offset, uint32_t data_len, WasmPtrT signature_offset, uint32_t signature_len, WasmPtrT key_offset, uint32_t key_len) -> uint32_t {
 			wasmtime::Span<uint8_t> mem = engine.wasm_runtime()->memory().data(caller.context());
 			const uint8_t* data = WasmPtrToPtr<const uint8_t*>(mem, data_offset);

@@ -905,17 +905,10 @@ void CRuntimeInterface::Event_Exception(const char* msg, prlrt::ExceptionType ex
 void CRuntimeInterface::Util_SHA3(const uint8_t* data, uint32_t data_len, uint8_t* out, uint32_t out_len)
 {
 	std::unique_ptr<Botan::HashFunction> hash(Botan::HashFunction::create("SHA-3(256)"));
-	if(!hash) {
-		std::cerr << "SHA-3 not supported by Botan library" << std::endl;
-		return;
-	}
-
 	hash->update(data, data_len);
-	auto hash_output   = hash->final();
+	auto hash_output = hash->final();
 
-	if (out_len < hash_output.size()) {
-        throw std::runtime_error("Output buffer too small for SHA-3 hash");
-    }
+	ASSERT(out_len >= hash_output.size());
 	std::copy(hash_output.begin(), hash_output.end(), out);
 	return ;
 }
@@ -923,28 +916,18 @@ void CRuntimeInterface::Util_SHA3(const uint8_t* data, uint32_t data_len, uint8_
 void CRuntimeInterface::Util_MD5(const uint8_t* data, uint32_t data_len, uint8_t* out, uint32_t out_len)
 {
 	std::unique_ptr<Botan::HashFunction> hash_fn(Botan::HashFunction::create("MD5"));
-    if (!hash_fn) {
-        throw std::runtime_error("MD5 not supported");
-    }
     hash_fn->update(data, data_len);
     Botan::secure_vector<uint8_t> hash_output = hash_fn->final();
-    if (out_len < hash_output.size()) {
-        throw std::runtime_error("Output buffer too small for MD5 hash");
-    }
+    ASSERT(out_len >= hash_output.size());
     std::copy(hash_output.begin(), hash_output.end(), out);
 }
 
 void CRuntimeInterface::Util_SM3(const uint8_t* data, uint32_t data_len, uint8_t* out, uint32_t out_len)
 {
 	std::unique_ptr<Botan::HashFunction> hash_fn(Botan::HashFunction::create("SM3"));
-    if (!hash_fn) {
-        throw std::runtime_error("SM3 not supported");
-    }
     hash_fn->update(data, data_len);
     Botan::secure_vector<uint8_t> hash_output = hash_fn->final();
-    if (out_len < hash_output.size()) {
-        throw std::runtime_error("Output buffer too small for SM3 hash");
-    }
+    ASSERT(out_len >= hash_output.size());
     std::copy(hash_output.begin(), hash_output.end(), out);
 }
 
@@ -958,19 +941,13 @@ void CRuntimeInterface::Util_SM4Enc(const uint8_t* data, uint32_t data_len, cons
     }
 
     uint32_t padded_len = data_len + (block_size - (data_len % block_size));
-    if (out_len < padded_len) {
-        throw std::runtime_error("Output buffer too small for SM4 encryption");
-    }
+    ASSERT(out_len >= padded_len);
 
     std::vector<uint8_t> padded_data(data, data + data_len);
     uint8_t padding_value = block_size - (data_len % block_size);
     padded_data.insert(padded_data.end(), padding_value, padding_value);
 
     std::unique_ptr<Botan::BlockCipher> cipher(Botan::BlockCipher::create("SM4"));
-    if (!cipher) {
-        throw std::runtime_error("SM4 not supported by Botan library");
-    }
-
     cipher->set_key(key_buffer.data(), block_size);
     for (uint32_t i = 0; i < padded_len; i += block_size) {
         cipher->encrypt(padded_data.data() + i, out + i);
@@ -986,65 +963,38 @@ void CRuntimeInterface::Util_SM4Dec(const uint8_t* encrypted, uint32_t encrypted
         key_buffer[i] = key[i % key_len];
     }
 
-    if (encrypted_len % block_size != 0) {
-        throw std::runtime_error("SM4 encrypted data length must be a multiple of 16 bytes");
-    }
-
-    if (out_len < encrypted_len) {
-        throw std::runtime_error("Output buffer too small for SM4 decryption");
-    }
+    ASSERT(encrypted_len % block_size == 0);
+    ASSERT(out_len >= encrypted_len);
 
     std::unique_ptr<Botan::BlockCipher> cipher(Botan::BlockCipher::create("SM4"));
-    if (!cipher) {
-        throw std::runtime_error("SM4 not supported by Botan library");
-    }
-
     cipher->set_key(key_buffer.data(), block_size);
     for (uint32_t i = 0; i < encrypted_len; i += block_size) {
         cipher->decrypt(encrypted + i, out + i);
     }
 
     uint8_t padding_length = out[encrypted_len - 1];
-    if (padding_length > block_size) {
-        throw std::runtime_error("Invalid padding length");
-    }
+    ASSERT(padding_length <= block_size);
     for (uint32_t i = 0; i < padding_length; ++i) {
-        if (out[encrypted_len - 1 - i] != padding_length) {
-            throw std::runtime_error("Invalid padding");
-        }
+        ASSERT(out[encrypted_len - 1 - i] == padding_length);
     }
     out_len = encrypted_len - padding_length;
 }
 
 
 void CRuntimeInterface::Util_SM2Sign(const uint8_t* data, uint32_t data_len, const uint8_t* private_key, uint32_t key_len, uint8_t* out, uint32_t out_len) {
-    if (out_len < 64) {  
-        throw std::runtime_error("Output buffer too small for SM2 signature");
-    }
-
+    ASSERT(out_len >= 64);
 	Botan::AutoSeeded_RNG rng;
 	Botan::DataSource_Memory key_data(private_key, key_len);
 	std::unique_ptr<Botan::Private_Key> priv_key(Botan::PKCS8::load_key(key_data, rng));
-
-	if (!priv_key) {
-		throw std::runtime_error("Failed to load private key");
-	}
-
+	ASSERT(priv_key);
 	Botan::SM2_PrivateKey* sm2_key = dynamic_cast<Botan::SM2_PrivateKey*>(priv_key.get());
-	if (!sm2_key) {
-		throw std::runtime_error("Loaded key is not an SM2 private key");
-	}
-
+	ASSERT(sm2_key);
 	Botan::PK_Signer signer(*sm2_key, rng, "EMSA1(SM3)");
+	
 	signer.update(data, data_len);
 	std::vector<uint8_t> signature = signer.signature(rng);
-
-	if (signature.size() > out_len) {
-		throw std::runtime_error("Output buffer too small for SM2 signature");
-	}
-
-	std::copy(signature.begin(), signature.end(), out);
-   
+	ASSERT(signature.size() <= out_len);
+	std::copy(signature.begin(), signature.end(), out); 
 }
 
 
