@@ -21,3 +21,10 @@ oxd_preda/bin/solc/*
 !oxd_preda/bin/solc/.gitkeep
 !oxd_preda/bin/emscripten/3.1.24/.gitkeep
 preda-toolchain.exe
+.cache/
+*.html
+.antlr/
+bin_debug/
+oxd_libsec/lib/
+bin_release/
+dist/
