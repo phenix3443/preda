@@ -1,0 +1,12 @@
+contract SimpleStorage {
+    uint32 storedData;
+
+    function int32 set(const uint32 x) export {
+        storedData = x;
+		return 0;
+    }
+
+    function uint32 get() public const {
+        return storedData;
+    }
+}
