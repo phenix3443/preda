@@ -4,13 +4,19 @@ chain.gaslimit 256
 
 chain.deploy @1 upgrade.prd
 
-log.highlight SimpleStorage upgrade
-
-log Perparing init upgrade data
+log.highlight SimpleStorage deploy first time
 
 txn1[] = SimpleStorage.set #global {x: 10}
 txn2[] = SimpleStorage.get
 chain.info
+
+log.highlight SimpleStorage deploy second time
+
+chain.deploy @1 upgrade.prd
+txn3[] = SimpleStorage.set #global {x: 10}
+txn4[] = SimpleStorage.get
+chain.info
+
 
 stopwatch.restart
 chain.run
