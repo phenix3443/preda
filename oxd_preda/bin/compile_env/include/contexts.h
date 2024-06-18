@@ -3,11 +3,6 @@
 #include "inttypes.h"
 #include "address_blob_hash_types.h"
 #include "arraytype.h"
-#include <iostream>
-#include <sstream>
-#include <iomanip>
-#include <stdexcept>
-#include <cctype>
 
 namespace prlrt {
 
@@ -200,7 +195,7 @@ prlrt::__prlt___debug __prli___debug;
 
 namespace prlrt {
 	struct __prlt__util {
-		__prlt_array<__prlt_uint8> __prli_string_to_array(const __prlt_string& data) 
+		__prlt_array<__prlt_uint8> __prli_string_to_array(const __prlt_string& data)
 		{
 			__prlt_array<__prlt_uint8> result;
 			for (auto c : data.ptr->str) {
@@ -209,7 +204,7 @@ namespace prlrt {
 			return result;
 		}
 
-		__prlt_string __prli_array_to_string(const __prlt_array<__prlt_uint8>& data) 
+		__prlt_string __prli_array_to_string(const __prlt_array<__prlt_uint8>& data)
 		{
 			__prlt_string result;
 			for (auto b : data.ptr->v) {
@@ -218,35 +213,41 @@ namespace prlrt {
 			return result;
 		}
 
-		__prlt_string __prli_hex_encode(const __prlt_array<__prlt_uint8>& input) 
+		__prlt_string __prli_hex_encode(const __prlt_array<__prlt_uint8>& input)
 		{
-			std::stringstream ss;
-			ss << std::hex << std::setfill('0');
-			for (auto b : input.ptr->v) {
-				ss << std::setw(2) << static_cast<int>(b._v);
+			static const char hex_digits[] = "0123456789abcdef";
+			std::string result;
+			result.reserve(input.ptr->v.size() * 2);
+			for (const auto& b : input.ptr->v) {
+				result.push_back(hex_digits[(b._v >> 4) & 0xF]);
+				result.push_back(hex_digits[b._v & 0xF]);
 			}
-			__prlt_string result;
-			result.ptr->str = ss.str();
-			return result;
+			__prlt_string hex_string;
+			hex_string.ptr->str = std::move(result);
+			return hex_string;
 		}
 
-		__prlt_array<__prlt_uint8> __prli_hex_decode(const __prlt_string& hex) 
+		__prlt_array<__prlt_uint8> __prli_hex_decode(const __prlt_string& hex)
 		{
 			if (hex.ptr->str.length() % 2 != 0) {
-				throw std::invalid_argument("Invalid hex string: length must be even.");
+				preda_exception::throw_exception("invalid hex string: length must be even.", prlrt::ExceptionType::AssertionFailure);
 			}
 
 			__prlt_array<__prlt_uint8> bytes;
-			bytes.ptr->set_length(hex.ptr->str.length() / 2);
+			bytes.__prli_set_length(hex.ptr->str.length() / 2);
 			for (size_t i = 0; i < hex.ptr->str.length(); i += 2) {
 				std::string byteString = hex.ptr->str.substr(i, 2);
-				uint8_t byte = static_cast<uint8_t>(std::stoi(byteString, nullptr, 16));
-				bytes.__prli_push(byte);
+				char* end;
+				unsigned long byte = std::strtoul(byteString.c_str(), &end, 16);
+				if (*end != '\0' || byte > 0xFF) {
+					preda_exception::throw_exception("invalid hex string: contains non-hex characters.", prlrt::ExceptionType::AssertionFailure);
+				}
+				bytes.__prli_push(static_cast<uint8_t>(byte));
 			}
 			return bytes;
 		}
 
-		uint8_t* __prlt_array_to_uint8(const __prlt_array<__prlt_uint8>& data, size_t& out_size) 
+		uint8_t* __prlt_array_to_uint8(const __prlt_array<__prlt_uint8>& data, size_t& out_size)
 		{
 			out_size = data.__prli_length()._v;
 			std::unique_ptr<uint8_t[]> buffer(new uint8_t[out_size]);
@@ -256,7 +257,7 @@ namespace prlrt {
 			return buffer.release();
 		}
 
-		__prlt_array<__prlt_uint8> vector_to_prlt_array(const std::vector<uint8_t>& input) 
+		__prlt_array<__prlt_uint8> vector_to_prlt_array(const std::vector<uint8_t>& input)
 		{
 			__prlt_array<__prlt_uint8> result;
 			for (auto b : input) {
@@ -265,9 +266,9 @@ namespace prlrt {
 			return result;
 		}
 
-		__prlt_array<__prlt_uint8> __prli_sha3(const __prlt_array<__prlt_uint8>& data) 
+		__prlt_array<__prlt_uint8> __prli_sha3(const __prlt_array<__prlt_uint8>& data)
 		{
-			size_t data_size;
+			size_t data_size = data.__prli_length()._v;
 			auto data_buffer = std::unique_ptr<uint8_t[]>(__prlt_array_to_uint8(data, data_size));
 			const uint32_t sha3_output_len = 32;
 			std::vector<uint8_t> output_buffer(sha3_output_len);
@@ -277,7 +278,7 @@ namespace prlrt {
 
 		__prlt_array<__prlt_uint8> __prli_md5(const __prlt_array<__prlt_uint8>& data)
 		{
-			size_t data_size;
+			size_t data_size = data.__prli_length()._v;
 			auto data_buffer = std::unique_ptr<uint8_t[]>(__prlt_array_to_uint8(data, data_size));
 			const uint32_t output_len = 16;
 			std::vector<uint8_t> output_buffer(output_len);
@@ -285,9 +286,9 @@ namespace prlrt {
 			return vector_to_prlt_array(output_buffer);
 		}
 
-		__prlt_array<__prlt_uint8> __prli_sm3(const __prlt_array<__prlt_uint8>& data) 
+		__prlt_array<__prlt_uint8> __prli_sm3(const __prlt_array<__prlt_uint8>& data)
 		{
-			size_t data_size;
+			size_t data_size = data.__prli_length()._v;
 			auto data_buffer = std::unique_ptr<uint8_t[]>(__prlt_array_to_uint8(data, data_size));
 			const uint32_t output_len = 32;
 			std::vector<uint8_t> output_buffer(output_len);
@@ -295,11 +296,11 @@ namespace prlrt {
 			return vector_to_prlt_array(output_buffer);
 		}
 
-		__prlt_array<__prlt_uint8> __prli_sm4_enc(const __prlt_array<__prlt_uint8>& data, const __prlt_array<__prlt_uint8>& key) 
+		__prlt_array<__prlt_uint8> __prli_sm4_enc(const __prlt_array<__prlt_uint8>& data, const __prlt_array<__prlt_uint8>& key)
 		{
-			size_t data_size;
+			size_t data_size = data.__prli_length()._v;
 			auto data_buffer = std::unique_ptr<uint8_t[]>(__prlt_array_to_uint8(data, data_size));
-			size_t key_size;
+			size_t key_size = key.__prli_length()._v;
 			auto key_buffer = std::unique_ptr<uint8_t[]>(__prlt_array_to_uint8(key, key_size));
 
 			const uint32_t block_size = 16;
@@ -309,25 +310,25 @@ namespace prlrt {
 			return vector_to_prlt_array(output_buffer);
 		}
 
-		__prlt_array<__prlt_uint8> __prli_sm4_dec(const __prlt_array<__prlt_uint8>& encrypted, const __prlt_array<__prlt_uint8>& key) 
+		__prlt_array<__prlt_uint8> __prli_sm4_dec(const __prlt_array<__prlt_uint8>& encrypted, const __prlt_array<__prlt_uint8>& key)
 		{
-			size_t encrypted_size;
+			size_t encrypted_size = encrypted.__prli_length()._v;
 			auto encrypted_buffer = std::unique_ptr<uint8_t[]>(__prlt_array_to_uint8(encrypted, encrypted_size));
-			size_t key_size;
+			size_t key_size = key.__prli_length()._v;
 			auto key_buffer = std::unique_ptr<uint8_t[]>(__prlt_array_to_uint8(key, key_size));
 
 			std::vector<uint8_t> output_buffer(encrypted_size);
-			uint32_t out_len;
+			uint32_t out_len = encrypted_size;
 			PREDA_CALL(Util_SM4Dec, encrypted_buffer.get(), encrypted_size, key_buffer.get(), key_size, output_buffer.data(), out_len);
 			output_buffer.resize(out_len);
 			return vector_to_prlt_array(output_buffer);
 		}
 
-		__prlt_array<__prlt_uint8> __prli_sm2_sign(const __prlt_array<__prlt_uint8>& data, const __prlt_array<__prlt_uint8>& private_key) 
+		__prlt_array<__prlt_uint8> __prli_sm2_sign(const __prlt_array<__prlt_uint8>& data, const __prlt_array<__prlt_uint8>& private_key)
 		{
-			size_t data_size;
+			size_t data_size = data.__prli_length()._v;
 			auto data_buffer = std::unique_ptr<uint8_t[]>(__prlt_array_to_uint8(data, data_size));
-			size_t key_size;
+			size_t key_size = private_key.__prli_length()._v;
 			auto key_buffer = std::unique_ptr<uint8_t[]>(__prlt_array_to_uint8(private_key, key_size));
 
 			const uint32_t signature_len = 64;
@@ -336,13 +337,13 @@ namespace prlrt {
 			return vector_to_prlt_array(signature_buffer);
 		}
 
-		__prlt_bool __prli_sm2_verify(const __prlt_array<__prlt_uint8>& data, const __prlt_array<__prlt_uint8>& signature, const __prlt_array<__prlt_uint8>& public_key) 
+		__prlt_bool __prli_sm2_verify(const __prlt_array<__prlt_uint8>& data, const __prlt_array<__prlt_uint8>& signature, const __prlt_array<__prlt_uint8>& public_key)
 		{
-			size_t data_size;
+			size_t data_size = data.__prli_length()._v;
 			auto data_buffer = std::unique_ptr<uint8_t[]>(__prlt_array_to_uint8(data, data_size));
-			size_t signature_size;
+			size_t signature_size = signature.__prli_length()._v;
 			auto signature_buffer = std::unique_ptr<uint8_t[]>(__prlt_array_to_uint8(signature, signature_size));
-			size_t key_size;
+			size_t key_size = public_key.__prli_length()._v;
 			auto key_buffer = std::unique_ptr<uint8_t[]>(__prlt_array_to_uint8(public_key, key_size));
 			bool result = PREDA_CALL(Util_SM2Verify, data_buffer.get(), data_size, signature_buffer.get(), signature_size, key_buffer.get(), key_size);
 			return result ? __prlt_bool(true) : __prlt_bool(false);

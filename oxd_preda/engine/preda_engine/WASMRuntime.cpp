@@ -916,12 +916,13 @@ std::optional<wasmtime::Linker> WASMRuntime::CreateBaseLinker(CExecutionEngine& 
 	}
 
 	if (!linker.func_wrap("env", "predaUtil_SM4Dec",
-		[&engine](wasmtime::Caller caller, WasmPtrT data_offset, uint32_t data_len, WasmPtrT key_offset, uint32_t key_len,  WasmPtrT out_offset, uint32_t out_len) -> void {
+		[&engine](wasmtime::Caller caller, WasmPtrT data_offset, uint32_t data_len, WasmPtrT key_offset, uint32_t key_len,  WasmPtrT out_offset, WasmPtrT out_len_offset) -> void {
 			wasmtime::Span<uint8_t> mem = engine.wasm_runtime()->memory().data(caller.context());
 			const uint8_t* data = WasmPtrToPtr<const uint8_t*>(mem, data_offset);
 			const uint8_t* key = WasmPtrToPtr<const uint8_t*>(mem, key_offset);
 			uint8_t* out = WasmPtrToPtr<uint8_t*>(mem, out_offset);
-			return engine.runtimeInterface().Util_SM4Dec(data, data_len, key, key_len, out, out_len);
+			uint32_t* out_len = WasmPtrToPtr<uint32_t*>(mem, out_len_offset);
+			return engine.runtimeInterface().Util_SM4Dec(data, data_len, key, key_len, out, *out_len);
 		})) {
 		return {};
 	}
