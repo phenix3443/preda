@@ -14,9 +14,9 @@ namespace oxd
 
 	const ContractsDatabase::ContractInfo* ContractsDatabase::FindContractInfo(const rvm::ContractModuleID& mid)
 	{
-		for (auto& it : _ContractInfo)
+	for(auto& it : _ContractInfo)
 		{
-			if (rt::IsEqual(it.second->Deployment.Module, mid))
+		if(rt::IsEqual(it.second->Deployment.Module, mid))
 				return it.second;
 		}
 
@@ -25,15 +25,15 @@ namespace oxd
 
 	void ContractsDatabase::Commit(ContractsDatabase& x)
 	{
-		for (auto& it : _ContractInfo)
+	for(auto& it : _ContractInfo)
 			x._ContractInfo[it.first] = it.second;
-		for (auto& it : _Contracts)
+	for(auto& it : _Contracts)
 			x._Contracts[it.first] = it.second;
-		for (auto& it : _ContractBuildNumLatest)
+	for(auto& it : _ContractBuildNumLatest)
 			x._ContractBuildNumLatest[it.first] = it.second;
-		for (auto& it : _ContractFunctions)
+	for(auto& it : _ContractFunctions)
 			x._ContractFunctions[it.first] = it.second;
-		for (auto& it : _ContractEngine)
+	for(auto& it : _ContractEngine)
 			x._ContractEngine[it.first] = it.second;
 
 		x._NextContractSN = _NextContractSN;
@@ -44,7 +44,7 @@ namespace oxd
 
 	void ContractsDatabase::Revert()
 	{
-		for (auto& p : _ContractInfo)
+	for(auto& p : _ContractInfo)
 			p.second->Release();
 		_ContractInfo.clear();
 
@@ -65,10 +65,10 @@ namespace oxd
 
 	rvm::BuildNum SimuGlobalShard::_GetContractEffectiveBuild(rvm::ContractId contract) const
 	{
-		if (_bDeploying)
+	if(_bDeploying)
 		{
 			auto v = _DeployingDatabase._ContractBuildNumLatest.get(contract, 0);
-			if (v)return v;
+		if(v)return v;
 		}
 
 		return _ContractBuildNumLatest.get(contract, 0);
@@ -76,15 +76,15 @@ namespace oxd
 
 	const rvm::DeployedContract* SimuGlobalShard::_GetContractDeployed(rvm::ContractVersionId contract) const
 	{
-		if (_bDeploying)
+	if(_bDeploying)
 		{
 			auto it = _DeployingDatabase._ContractInfo.find(contract);
-			if (it != _DeployingDatabase._ContractInfo.end())
+		if(it != _DeployingDatabase._ContractInfo.end())
 				return &it->second->Deployment;
 		}
 
 		auto it = _ContractInfo.find(contract);
-		if (it != _ContractInfo.end())
+	if(it != _ContractInfo.end())
 			return &it->second->Deployment;
 		else
 			return nullptr;
@@ -102,7 +102,7 @@ namespace oxd
 	{
 		ASSERT(_bDeploying);
 
-		if (commit)
+	if(commit)
 		{
 			_DeployingDatabase.Commit(*this);
 			_DeployingStates.Commit(*this);
@@ -118,13 +118,13 @@ namespace oxd
 
 	void SimuGlobalShard::_OnGlobalTransactionExecuted(bool succeess)
 	{
-		if (_bDeploying)
+	if(_bDeploying)
 			DeployEnd(succeess);
 	}
 
 	ContractsDatabase::ContractInfo* ContractsDatabase::ContractInfo::Clone() const
 	{
-		uint32_t len = GetSize();
+	uint32_t len =  GetSize();
 		auto* ret = (ContractInfo*)_Malloc32AL(BYTE, len);
 		memcpy(ret, this, len);
 
@@ -135,15 +135,15 @@ namespace oxd
 	{
 		ASSERT(origin_deploy);
 		ASSERT(_pTxn);
-		if (!_bDeploying)
+	if(!_bDeploying)
 		{	// DeployBegin, unnamed deployment can be invoked more than once in a single transaction execution
 			_bDeploying = true;
 			_DeployingDatabase.Reset(*this);
 		}
 
 		auto* info = _DeployingDatabase.FindContractInfo(origin_deploy->Module);
-		if (!info)info = FindContractInfo(origin_deploy->Module);
-		if (info)
+	if(!info)info = FindContractInfo(origin_deploy->Module);
+	if(info)
 		{
 			rvm::ContractVersionId cid = rvm::CONTRACT_ID_MAKE(
 				_DeployingDatabase._NextContractSN++,
@@ -169,13 +169,13 @@ namespace oxd
 	{
 		SimuState* r = nullptr;
 
-		if (_bDeploying && _DeployingStates._ShardStates.Get(contract, &r))
+	if(_bDeploying && _DeployingStates._ShardStates.Get(contract, &r))
 			goto FOUND;
 
 		r = _ShardStates.Get(contract);
 
 	FOUND:
-		if (r)return { r->Data, r->DataSize, r->Version };
+	if(r)return { r->Data, r->DataSize, r->Version };
 		else return { nullptr, 0, 0 };
 	}
 
@@ -184,21 +184,21 @@ namespace oxd
 		ShardStateKey k = { contract, *key };
 		SimuState* r = nullptr;
 
-		if (_bDeploying && _DeployingStates._ShardKeyedStates.Get(k, &r))
+	if(_bDeploying && _DeployingStates._ShardKeyedStates.Get(k, &r))
 			goto FOUND;
 
 		r = _ShardKeyedStates.Get(k);
 
 	FOUND:
-		if (r)return { r->Data, r->DataSize, r->Version };
+	if(r)return { r->Data, r->DataSize, r->Version };
 		else return { nullptr, 0, 0 };
 	}
 
 	void SimuGlobalShard::CommitNewState(rvm::ContractInvokeId ciid, uint8_t* state)
 	{
-		if (_bDeploying)
+	if(_bDeploying)
 		{
-			if (state)
+		if(state)
 			{
 				auto* s = (SimuState*)(state - offsetof(SimuState, Data));
 				s->Version = rvm::CONTRACT_BUILD(ciid);
@@ -216,12 +216,12 @@ namespace oxd
 
 	void SimuGlobalShard::CommitNewState(rvm::ContractInvokeId contract, const rvm::ScopeKey* key, uint8_t* state)
 	{
-		if (_bDeploying)
+	if(_bDeploying)
 		{
 			auto csid = rvm::CONTRACT_UNSET_BUILD(contract);
 			ShardStateKey k = { csid, *key };
 
-			if (state)
+		if(state)
 			{
 				auto* s = (SimuState*)(state - offsetof(SimuState, Data));
 				s->Version = rvm::CONTRACT_BUILD(contract);
@@ -244,13 +244,13 @@ namespace oxd
 
 		rvm::EngineId e = linked->GetEngineId();
 		uint32_t count = (uint32_t)linked->GetCount();
-		for (uint32_t i = 0; i < count; i++)
+	for(uint32_t i=0; i<count; i++)
 		{
 			auto* c = linked->GetContract(i);
 			rt::String full_name = _pSimulator->DAPP_NAME + '.' + c->GetName().Str();
 
 			rvm::ContractVersionId cvid = _Contracts.get(full_name, rvm::ContractVersionIdInvalid);
-			if (cvid == rvm::ContractVersionIdInvalid)
+		if(cvid == rvm::ContractVersionIdInvalid)
 			{
 				rvm::ContractId cid = rvm::CONTRACT_ID_MAKE(_DeployingDatabase._NextContractSN++, _pSimulator->DAPP_ID, e);
 				cvid = rvm::CONTRACT_SET_BUILD(cid, BUILD_NUM_INIT);
@@ -262,7 +262,7 @@ namespace oxd
 			}
 			else
 			{
-				if (_DeployingDatabase._ContractEngine[full_name] != e && _ContractEngine[full_name] != e)
+			if(_DeployingDatabase._ContractEngine[full_name] != e && _ContractEngine[full_name] != e)
 				{
 					_LOG("[PRD] Contract " << full_name << " already deployed with another engine")
 						return false;
@@ -281,7 +281,7 @@ namespace oxd
 
 	rvm::DAppId	SimuGlobalShard::_GetDAppByName(const rvm::ConstString* dapp_name) const
 	{
-		if (dapp_name->Str() == Simulator::Get().DAPP_NAME)
+	if(dapp_name->Str() == Simulator::Get().DAPP_NAME)
 			return Simulator::Get().DAPP_ID;
 
 		return rvm::DAppIdInvalid;
@@ -299,12 +299,12 @@ namespace oxd
 		if (stub.DataSize > 0)
 			memcpy(info->Deployment.Stub, stub.DataPtr, stub.DataSize);
 
-		for (int i = 0; i < 256; i++)
+	for(int i=0; i<256; i++)
 			info->ScopeOfOpcode[i] = rvm::ScopeInvalid;
 
 		UINT func_co = c->GetFunctionCount();
 		rt::String funcname;
-		for (UINT i = 0; i < func_co; i++)
+	for(UINT i=0; i<func_co; i++)
 		{
 			auto opcode = c->GetFunctionOpCode(i);
 			info->ScopeOfOpcode[(int)opcode] = c->GetFunctionScope(i);
@@ -325,7 +325,7 @@ namespace oxd
 
 		rt::String if_prefix;
 		uint32_t count = deployed->GetCount();
-		for (uint32_t i = 0; i < count; i++)
+	for(uint32_t i=0; i<count; i++)
 		{
 			auto* c = deployed->GetContract(i);
 			auto name = c->GetName();
@@ -494,10 +494,10 @@ namespace oxd
 	rvm::ContractVersionId SimuGlobalShard::_GetContractByName(const rvm::ConstString* dapp_contract_name) const
 	{
 		rvm::ContractVersionId r = rvm::ContractVersionIdInvalid;
-		if (_bDeploying)
+	if(_bDeploying)
 			r = _DeployingDatabase._Contracts.get(dapp_contract_name->Str(), rvm::ContractVersionIdInvalid);
 
-		if (r == rvm::ContractVersionIdInvalid)
+	if(r == rvm::ContractVersionIdInvalid)
 			r = _Contracts.get(dapp_contract_name->Str(), rvm::ContractVersionIdInvalid);
 
 		return r;
@@ -569,21 +569,21 @@ namespace oxd
 		_Filenames.push_back(fn);
 		_ConstructorArgs.push_back(deploy_arg);
 
-		if (!contract_name.IsEmpty())
+	if(!contract_name.IsEmpty())
 		{
-			_LOG("Source code for contract `" << contract_name << "` is loaded from " << fn);
+		_LOG("Source code for contract `"<<contract_name<<"` is loaded from "<<fn);
 		}
 		else
 		{
-			_LOG("Cannot extract contract name from source code file " << fn);
+		_LOG("Cannot extract contract name from source code file "<<fn);
 		}
 	}
 
-	void BuildContracts::Log(rvm::LogMessageType type, uint32_t code, uint32_t unitIndex, uint32_t line, uint32_t lineOffset, const rvm::ConstString* message)
+void BuildContracts::Log(rvm::LogMessageType type, uint32_t code, uint32_t unitIndex, uint32_t line, uint32_t lineOffset, const rvm::ConstString *message)
 	{
 		auto log_type = rt::LOGTYPE_INFORMATIONAL;
 		LPCSTR type_str = "";
-		switch (type)
+	switch(type)
 		{
 		case rvm::LogMessageType::Error:		type_str = "error";		log_type = rt::LOGTYPE_ERROR;	break;
 		case rvm::LogMessageType::Warning:		type_str = "warning";	log_type = rt::LOGTYPE_WARNING;	break;
@@ -592,32 +592,32 @@ namespace oxd
 		}
 
 		rt::String_Ref msg = "<no message>";
-		if (message)msg = rt::String_Ref(message->StrPtr, message->Length);
+	if(message)msg = rt::String_Ref(message->StrPtr, message->Length);
 
 		const char* label[] = { nullptr, "compile", "link", "deploy", nullptr };
 
 		rt::String_Ref fn = _Filenames[unitIndex];
-		if (fn.IsEmpty())
+	if(fn.IsEmpty())
 		{
 			auto str = rt::SS("build_unit#") + unitIndex + '[' + rt::EnumStringify(_EngineId) + ']';
 			fn = ALLOCA_C_STRING(str);
 		}
 
-		__LOG_TYPE(fn << '(' << line << ':' << lineOffset << "): " <<
-			label[_Stage] << ' ' << type_str << " #" << code << rt::SS(": ") <<
+	__LOG_TYPE(	fn<<'('<<line<<':'<<lineOffset<<"): "<<
+				label[_Stage]<<' '<<type_str<<" #"<<code<<rt::SS(": ")<<
 			msg,
-			rt::LOGTYPE_IN_CONSOLE | rt::LOGTYPE_IN_LOGFILE | log_type
+				rt::LOGTYPE_IN_CONSOLE|rt::LOGTYPE_IN_LOGFILE|log_type
 		);
 	}
 
 	bool BuildContracts::Compile(bool checkDeployArg)
 	{
 		uint32_t count = (uint32_t)_Sources.GetSize();
-		if (!count)return false;
+	if(!count)return false;
 
-		if (!_pEngine)
+	if(!_pEngine)
 		{
-			_LOG_WARNING("Engine " << rt::EnumStringify(_EngineId) << " is not available");
+		_LOG_WARNING("Engine "<<rt::EnumStringify(_EngineId)<<" is not available");
 			return false;
 		}
 
@@ -626,28 +626,28 @@ namespace oxd
 
 		auto* codes = (rvm::ConstData*)_alloca(sizeof(rvm::ConstData) * count);
 
-		for (uint32_t i = 0; i < count; i++)
+	for(uint32_t i = 0; i < count; i++)
 			codes[i] = { (uint8_t*)_Sources[i].Begin(), (uint32_t)_Sources[i].GetLength() };
 
 		_Stage = STAGE_COMPILE;
 		_LOG("Compiling " << count << " contract(s), target=" << rt::EnumStringify(_EngineId));
 
 		rvm::CompilationFlag cflag = rvm::CompilationFlag::None;
-		if (os::CommandLine::Get().HasOption("perftest"))
+	if(os::CommandLine::Get().HasOption("perftest"))
 			cflag |= rvm::CompilationFlag::DisableDebugPrint;
 
 		rvm::ConstString dapp = { _DAppName.Begin(), (uint32_t)_DAppName.GetLength() };
-		if (_pEngine->Compile(&dapp, count, codes, cflag, &_pCompiled, this) && _pCompiled && _pCompiled->GetCount() == count)
+	if(_pEngine->Compile(&dapp, count, codes, cflag, &_pCompiled, this) && _pCompiled && _pCompiled->GetCount() == count)
 		{
 			_ResetContractWorkData(count);
 			rt::String filename, sig;
 
-			for (uint32_t i = 0; i < count; i++)
+		for(uint32_t i = 0; i < count; i++)
 			{
 				auto* contract = _pCompiled->GetContract(i);
 				ASSERT(contract);
 
-				if (_EngineId == rvm::EngineId::SOLIDITY_EVM)
+			if(_EngineId == rvm::EngineId::SOLIDITY_EVM)
 				{
 					rt::JsonObject sol_json(_Sources[0]);
 					_ContractToFilename[sol_json.GetValue("entryContract")] = filename = sol_json.GetValue("entryFile");
@@ -670,23 +670,23 @@ namespace oxd
 						goto COMPILE_FAILED;
 					}
 				}
-				else if (checkDeployArg)
+			else if(checkDeployArg)
 				{
 					uint32_t func_co = contract->GetFunctionCount();
-					for (uint32_t f = 0; f < func_co; f++)
-						if (opcodes.GlobalDeploy == contract->GetFunctionOpCode(f))
+				for(uint32_t f=0; f<func_co; f++)
+					if(opcodes.GlobalDeploy == contract->GetFunctionOpCode(f))
 						{
 							rvm::StringStreamImpl sig_ss(sig);
 
-							if (contract->GetFunctionSignature(f, &sig_ss))
+						if(contract->GetFunctionSignature(f, &sig_ss))
 							{
 								rvm::RvmDataJsonParser arg_parse(sig, nullptr);
 								std::vector<uint8_t> data;
 								if (deploy_arg.IsEmpty())			// when deploy_arg is not given, regarding it as an empty json
 									deploy_arg = "{}";
-								if (rvm::FunctionArgumentUtil::JsonParseArguments(sig.GetString(), nullptr, deploy_arg, data))
+							if(rvm::FunctionArgumentUtil::JsonParseArguments(sig.GetString(), nullptr, deploy_arg, data))
 								{
-									auto* d = _Malloc8AL(uint8_t, data.size());
+								auto* d =  _Malloc8AL(uint8_t, data.size());
 									memcpy(d, data.data(), data.size());
 
 									_ContractDeployArgs[i] = { d, (uint32_t)data.size() };
@@ -694,13 +694,13 @@ namespace oxd
 								}
 								else
 								{
-									_LOG_WARNING("[PRD]: Failed to parse Json of contract deploy arguments for `" << filename << '`');
+								_LOG_WARNING("[PRD]: Failed to parse Json of contract deploy arguments for `"<<filename<<'`');
 									goto COMPILE_FAILED;
 								}
 							}
 						}
 
-					_LOG_WARNING("[PRD]: Signature of contract deployment function in `" << filename << "` is not found");
+				_LOG_WARNING("[PRD]: Signature of contract deployment function in `"<<filename<<"` is not found");
 					goto COMPILE_FAILED;
 				}
 
@@ -723,7 +723,7 @@ namespace oxd
 	bool BuildContracts::Link()
 	{
 		uint32_t count = (uint32_t)_Sources.GetSize();
-		if (!count)return false;
+	if(!count)return false;
 
 		ASSERT(_Stage == STAGE_COMPILE);
 		ASSERT(_pCompiled);
@@ -733,7 +733,7 @@ namespace oxd
 		_LOG("[PRD]: Linking " << count << " contract(s), target=" << rt::EnumStringify(_EngineId));
 
 		ASSERT(_pEngine);
-		if (_pEngine->Link(_pCompiled, this))
+	if(_pEngine->Link(_pCompiled, this))
 			return true;
 
 		_LOG_WARNING("[PRD]: Link failed");
@@ -745,7 +745,7 @@ namespace oxd
 	bool BuildContracts::VerifyDependency(const rvm::GlobalStates* global_state) const
 	{
 		uint32_t count = (uint32_t)_Sources.GetSize();
-		if (!count)return true;
+	if(!count)return true;
 
 		ASSERT(_Stage >= STAGE_COMPILE);
 		ASSERT(_pCompiled);
@@ -758,21 +758,21 @@ namespace oxd
 
 	void BuildContracts::_ResetContractWorkData(uint32_t size)
 	{
-		for (auto& p : _ContractDeployArgs)
+	for(auto& p : _ContractDeployArgs)
 			_SafeFree8AL_ConstPtr(p.DataPtr);
 
 		_ContractDeployArgs.ChangeSize(size);
 		_ContractDeployArgs.Zero();
 
 		_ContractDeployStub.ChangeSize(size);
-		for (auto& s : _ContractDeployStub)
+	for(auto& s : _ContractDeployStub)
 			s.Empty();
 	}
 
 	bool BuildContracts::Deploy(rvm::ExecutionUnit* exec, rvm::ExecutionContext* exec_ctx)
 	{
 		uint32_t count = (uint32_t)_Sources.GetSize();
-		if (!count)return false;
+	if(!count)return false;
 
 		ASSERT(_Stage == STAGE_LINK);
 		ASSERT(_pCompiled);
@@ -784,11 +784,11 @@ namespace oxd
 
 		_Stage = STAGE_DEPLOY;
 
-		rvm::DataBuffer** deploy_stub = (rvm::DataBuffer**)alloca(sizeof(rvm::DataBuffer*) * count);
-		for (uint32_t i = 0; i < count; i++)
+	rvm::DataBuffer** deploy_stub = (rvm::DataBuffer**)alloca(sizeof(rvm::DataBuffer*)*count);
+	for(uint32_t i=0; i<count; i++)
 			deploy_stub[i] = &_ContractDeployStub[i];
 
-		if (exec->DeployContracts(exec_ctx, _pCompiled, nullptr, deploy_stub, this))
+	if(exec->DeployContracts(exec_ctx, _pCompiled, nullptr, deploy_stub, this))
 			return true;
 
 		_ContractModuleIds.ShrinkSize(0);
