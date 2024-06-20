@@ -2,25 +2,30 @@ random.reseed
 allocate.address 1024
 chain.gaslimit 256
 
-chain.deploy @1 upgrade.prd
+chain.deploy @1 upgrade_1.prd
 
-log.highlight SimpleStorage deploy first time
+log.highlight SimpleStorage deploy
 
 txn1[] = SimpleStorage.set #global {x: 10}
 txn2[] = SimpleStorage.get
-chain.info
-
-log.highlight SimpleStorage deploy second time
-
-chain.deploy @1 upgrade.prd
-txn3[] = SimpleStorage.set #global {x: 10}
-txn4[] = SimpleStorage.get
-chain.info
-
-
-stopwatch.restart
+txn3[] = SimpleStorage.greet {}
+// chain.info
 chain.run
-stopwatch.report
+
+log.highlight SimpleStorage upgrade
+chain.deploy @1 upgrade_2.prd
+txn4[] = SimpleStorage.set #global {x: 10}
+txn5[] = SimpleStorage.get
+txn6[] = SimpleStorage.greet {}
+// chain.info
+chain.run
+
+log.highlight SimpleStorage upgrade failed
+chain.deploy @1 upgrade_3.prd
+txn7[] = SimpleStorage.get
+txn8[] = SimpleStorage.greet {}
+// chain.info
+chain.run
 
 chain.info
 

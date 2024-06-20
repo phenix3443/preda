@@ -1,0 +1,30 @@
+contract SimpleStorage {
+    struct S {
+        uint32 data;
+    }
+    enum E {
+        E0,
+        E1
+    }
+    interface Addable {
+        
+        @address function Add(uint64 value);
+        @global function uint64 GetTotal() const;
+    }
+    
+    S state1;
+    E state2;
+    function int32 set(const uint32 x) export {
+        state1.data = x;
+        state2 = E.E0;
+		return 0;
+    }
+
+    function uint32 get() public const {
+        return state1.data;
+    }
+
+    function greet() export {
+        __debug.print("deployed 1");
+    }
+}

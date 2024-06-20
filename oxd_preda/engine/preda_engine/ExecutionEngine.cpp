@@ -135,8 +135,8 @@ bool CExecutionEngine::MapNeededContractContext(rvm::ExecutionContext *execution
 			rvm::ConstStateData state = executionContext->GetState(rvm::CONTRACT_SET_SCOPE(rvm::CONTRACT_UNSET_BUILD(pInstance->cvId), scope));
 			if (state.DataSize)
 			{
-				if (state.Version != rvm::CONTRACT_BUILD(pInstance->cvId))		// the version of the state doesn't match the contract version, TODO: upgrade state when contract state upgrading is implemented in the future
-					return false;
+				// if (state.Version != rvm::CONTRACT_BUILD(pInstance->cvId))		// the version of the state doesn't match the contract version, TODO: upgrade state when contract state upgrading is implemented in the future
+				// 	return false;
 				m_inputStateCopies.push_back(std::vector<uint8_t>());
 				m_inputStateCopies.back().resize(state.DataSize);
 				memcpy(&m_inputStateCopies.back()[0], state.DataPtr, state.DataSize);

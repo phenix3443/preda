@@ -118,6 +118,7 @@ protected:
 protected:
 	rvm::DAppId							_GetDAppByName(const rvm::ConstString* dapp_name) const;
 	rvm::ContractVersionId				_GetContractByName(const rvm::ConstString* dapp_contract_name) const;
+	rvm::ContractVersionId				_GetDeployedContractByName(const rvm::ConstString* dapp_contract_name) const;
 	rvm::BuildNum						_GetContractEffectiveBuild(rvm::ContractId contract) const;
 	const rvm::DeployedContract*		_GetContractDeployed(rvm::ContractVersionId contract) const;
 	void								_FinalizeFunctionInfo(const rvm::ContractVersionId& cvid, const rt::String_Ref& func_prefix, const rvm::ContractModuleID& deploy_id, const rvm::Interface* info, const rvm::ConstData& stub);
@@ -146,6 +147,14 @@ public:
 	bool		CommitDeployment(const BuildContracts& deployed);
 	void		Term();
 	auto&		GetExecuteUnits(){ return _ExecUnits; }
+
+	bool 		CheckDeployedContract(const BuildContracts& built);
+	const rvm::Contract* GetDeployedContract(const BuildContracts& built, const rvm::Contract* compiled_contract);
+	bool 		CheckContractStateVariables(const rvm::Contract* compiled_contract, const rvm::Contract* deployed_contract);
+	bool 		CheckStructTypes(const rvm::Contract* compiled_contract, const rvm::Contract* deployed_contract);
+	bool 		CheckEnumTypes(const rvm::Contract* compiled_contract, const rvm::Contract* deployed_contract);
+	bool 		CheckInterfaceTypes(const rvm::Contract* compiled_contract, const rvm::Contract* deployed_contract);
+	bool 		CheckContractExportedFunctions(const rvm::Contract* compiled_contract, const rvm::Contract* deployed_contract);
 
 	SimuGlobalShard(Simulator* simu, uint64_t time_base, uint32_t shard_order);
 	virtual ~SimuGlobalShard(){ Term(); }

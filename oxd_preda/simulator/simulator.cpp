@@ -22,6 +22,7 @@ static const constexpr char* PREDA_DATA_FOLDER = "/Library/Application Support/.
 #elif defined(PLATFORM_LINUX)	
 static const constexpr char* PREDA_DATA_FOLDER = "/.preda/";
 #endif
+
 namespace oxd
 {
 void StandardOutWriter(LPCSTR log, int type, LPVOID cookie)
@@ -433,20 +434,16 @@ bool Simulator::Deploy(ExecutionUnit& exec_units, const rt::String_Ref* fns, con
 	};
 
 	auto check = [this](BuildContracts& b) {
-		if (b.GetSourceCount() == 0)return true;
-		for (uint32_t i = 0; i < b.GetSourceCount(); i++) {
-			_LOG_WARNING("[PRD]: Unsupported target for source code: " << i);
-			const rvm::Contract* compiled_contract; 
-			return CheckDeployedContract(compiled_contract);
-		}
-		return true;
+		if (b.GetSourceCount() == 0) return true;
+		return _pGlobalShard->CheckDeployedContract(b);
 	};
+
 	auto deploy = [this, &ctor_invoke_result](BuildContracts& b, rvm::ExecutionUnit* exec){
 		if(b.GetSourceCount() == 0)return true;
 		return b.Deploy(exec, _pGlobalShard) && _pGlobalShard->CommitDeployment(b) && (ctor_invoke_result = b.InvokeConstructor(exec, _pGlobalShard, -1)).Code == rvm::InvokeErrorCode::Success;
 	};
 
-	bool ret =	compile(solidity) && compile(preda_wasm) && compile(preda_native);
+	bool ret = compile(solidity) && compile(preda_wasm) && compile(preda_native);
 
 	ret = ret && check(solidity) && check(preda_wasm) && check(preda_native);
 
@@ -493,41 +490,6 @@ bool Simulator::Deploy(ExecutionUnit& exec_units, const rt::String_Ref* fns, con
 
 	_pGlobalShard->DeployEnd(ret);
 	return ret;
-}
-
-bool Simulator::CheckDeployedContract(const rvm::Contract* compiled_contract) 
-{
-	const rvm::Contract* deployed_contract = GetDeployedContract(compiled_contract);
-	if (!deployed_contract){
-		return true;
-	}
-	return CheckContractStateVariables(compiled_contract, deployed_contract) && 
-		CheckContractCustomTypes(compiled_contract, deployed_contract) && 
-		CheckContractExportedFunctions(compiled_contract, deployed_contract);
-}
-
-const rvm::Contract* Simulator::GetDeployedContract(const rvm::Contract* compiled_contract)
-{
-	// TODO
-	return NULL;
-}
-
-bool Simulator::CheckContractStateVariables(const rvm::Contract* compiled_contract, const rvm::Contract* deployed_contract) 
-{
-	// TODO
-	return true;
-}
-
-bool Simulator::CheckContractCustomTypes(const rvm::Contract* compiled_contract, const rvm::Contract* deployed_contract) 
-{
-	// TODO
-	return true;
-}
-
-bool Simulator::CheckContractExportedFunctions(const rvm::Contract* compiled_contract, const rvm::Contract* deployed_contract)
-{
-	// TODO
-	return true;
 }
 
 void Simulator::Run(rt::Buffer<rt::String_Ref>& input_files)
