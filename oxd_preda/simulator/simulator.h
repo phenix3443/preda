@@ -186,6 +186,7 @@ public:
 	bool			ExecuteCommand(const rt::String_Ref& cmd);
 	void			Run(rt::Buffer<rt::String_Ref>& input_files);
 	bool			Deploy(ExecutionUnit& exec_units, const rt::String_Ref* filenames, const rt::String_Ref* ctor_args, uint32_t count, bool within_script, rvm::InvokeResult &ctor_invoke_result);
+	const rvm::Contract* Simulator::GetDeployedContract(const rvm::Contract* compiled_contract);
 	bool			Compile(rvm::EngineId e, rt::Buffer<rt::String>& sources, rt::Buffer<rt::String_Ref>& code_fns);
 
 	void			OnTxnPushed(){ if(os::AtomicIncrement(&_PendingTxnCount) < 2)_ChainIdle.Reset(); }
