@@ -53,6 +53,7 @@ source_group("PredaEngine/ExecutionEngine/RuntimeInterface" FILES ${RuntimeInter
 source_group("PredaEngine/ExecutionEngine" FILES ${ExecutionEngine})
 source_group("rocksdb" FILES ${ROCKSDB})
 source_group("Source Files" FILES "${main}")
+
 add_library(preda_engine SHARED ${main} ${PREDA_ENGINE_FILES} ${PREDA_ENGINE_FILES_RVM} ${EVMEngine} ${native} ${ExecutionEngine} ${RuntimeInterface} ${ROCKSDB})
 target_sources(preda_engine
   PRIVATE

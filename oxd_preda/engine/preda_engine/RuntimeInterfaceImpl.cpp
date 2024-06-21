@@ -8,6 +8,9 @@
 #include "ContractDatabase.h"
 #include "RuntimeInterfaceImpl.h"
 
+#include "../../../SFC/core/ext/botan/botan.h"
+
+
 namespace _details
 {
 	struct AddressInplaceBuffer : public rvm::DataBuffer
@@ -896,4 +899,121 @@ void CRuntimeInterface::Event_Exception(const char* msg, prlrt::ExceptionType ex
 	// `curr_exc` is set to a stack value before calling any method inside vm
 	ASSERT(!exec_stack.empty());
 	exec_stack.top() = exc_type;
+}
+
+
+void CRuntimeInterface::Util_SHA3(const uint8_t* data, uint32_t data_len, uint8_t* out, uint32_t out_len)
+{
+	std::unique_ptr<Botan::HashFunction> hash(Botan::HashFunction::create("SHA-3(256)"));
+	hash->update(data, data_len);
+	auto hash_output = hash->final();
+
+	ASSERT(out_len >= hash_output.size());
+	std::copy(hash_output.begin(), hash_output.end(), out);
+	return ;
+}
+
+void CRuntimeInterface::Util_MD5(const uint8_t* data, uint32_t data_len, uint8_t* out, uint32_t out_len)
+{
+	std::unique_ptr<Botan::HashFunction> hash_fn(Botan::HashFunction::create("MD5"));
+    hash_fn->update(data, data_len);
+    Botan::secure_vector<uint8_t> hash_output = hash_fn->final();
+    ASSERT(out_len >= hash_output.size());
+    std::copy(hash_output.begin(), hash_output.end(), out);
+}
+
+void CRuntimeInterface::Util_SM3(const uint8_t* data, uint32_t data_len, uint8_t* out, uint32_t out_len)
+{
+	std::unique_ptr<Botan::HashFunction> hash_fn(Botan::HashFunction::create("SM3"));
+    hash_fn->update(data, data_len);
+    Botan::secure_vector<uint8_t> hash_output = hash_fn->final();
+    ASSERT(out_len >= hash_output.size());
+    std::copy(hash_output.begin(), hash_output.end(), out);
+}
+
+void CRuntimeInterface::Util_SM4Enc(const uint8_t* data, uint32_t data_len, const uint8_t* key, uint32_t key_len, uint8_t* out, uint32_t out_len)
+{
+	const uint32_t block_size = 16;
+
+    std::vector<uint8_t> key_buffer(block_size);
+    for (size_t i = 0; i < block_size; ++i) {
+        key_buffer[i] = key[i % key_len];
+    }
+
+    uint32_t padded_len = data_len + (block_size - (data_len % block_size));
+    ASSERT(out_len >= padded_len);
+
+    std::vector<uint8_t> padded_data(data, data + data_len);
+    uint8_t padding_value = block_size - (data_len % block_size);
+    padded_data.insert(padded_data.end(), padding_value, padding_value);
+
+    std::unique_ptr<Botan::BlockCipher> cipher(Botan::BlockCipher::create("SM4"));
+    cipher->set_key(key_buffer.data(), block_size);
+    for (uint32_t i = 0; i < padded_len; i += block_size) {
+        cipher->encrypt(padded_data.data() + i, out + i);
+    }
+}
+
+void CRuntimeInterface::Util_SM4Dec(const uint8_t* encrypted, uint32_t encrypted_len, const uint8_t* key, uint32_t key_len, uint8_t* out, uint32_t& out_len)
+{
+	const uint32_t block_size = 16;
+
+    std::vector<uint8_t> key_buffer(block_size);
+    for (size_t i = 0; i < block_size; ++i) {
+        key_buffer[i] = key[i % key_len];
+    }
+
+    ASSERT(encrypted_len % block_size == 0);
+    ASSERT(out_len >= encrypted_len);
+
+    std::unique_ptr<Botan::BlockCipher> cipher(Botan::BlockCipher::create("SM4"));
+    cipher->set_key(key_buffer.data(), block_size);
+    for (uint32_t i = 0; i < encrypted_len; i += block_size) {
+        cipher->decrypt(encrypted + i, out + i);
+    }
+
+    uint8_t padding_length = out[encrypted_len - 1];
+    ASSERT(padding_length <= block_size);
+    for (uint32_t i = 0; i < padding_length; ++i) {
+        ASSERT(out[encrypted_len - 1 - i] == padding_length);
+    }
+    out_len = encrypted_len - padding_length;
+}
+
+
+void CRuntimeInterface::Util_SM2Sign(const uint8_t* data, uint32_t data_len, const uint8_t* private_key, uint32_t key_len, uint8_t* out, uint32_t out_len) {
+    ASSERT(out_len >= 64);
+	Botan::AutoSeeded_RNG rng;
+	Botan::DataSource_Memory key_data(private_key, key_len);
+	std::unique_ptr<Botan::Private_Key> priv_key(Botan::PKCS8::load_key(key_data, rng));
+	ASSERT(priv_key);
+	Botan::SM2_PrivateKey* sm2_key = dynamic_cast<Botan::SM2_PrivateKey*>(priv_key.get());
+	ASSERT(sm2_key);
+	Botan::PK_Signer signer(*sm2_key, rng, "EMSA1(SM3)");
+	
+	signer.update(data, data_len);
+	std::vector<uint8_t> signature = signer.signature(rng);
+	ASSERT(signature.size() <= out_len);
+	std::copy(signature.begin(), signature.end(), out); 
+}
+
+
+bool CRuntimeInterface::Util_SM2Verify(const uint8_t* data, uint32_t data_len, const uint8_t* signature, uint32_t signature_len, const uint8_t* public_key, uint32_t key_len)
+{ 
+	Botan::AutoSeeded_RNG rng;
+
+    Botan::DataSource_Memory key_data(public_key, key_len);
+    std::unique_ptr<Botan::Public_Key> pub_key(Botan::X509::load_key(key_data));
+
+    if (!pub_key) {
+        throw std::runtime_error("Failed to load public key");
+    }
+
+    Botan::SM2_PublicKey* sm2_key = dynamic_cast<Botan::SM2_PublicKey*>(pub_key.get());
+    if (!sm2_key) {
+        throw std::runtime_error("Loaded key is not an SM2 public key");
+    }
+    Botan::PK_Verifier verifier(*sm2_key, "EMSA1(SM3)");
+    verifier.update(data, data_len);
+    return verifier.check_signature(signature, signature_len);
 }

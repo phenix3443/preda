@@ -265,7 +265,16 @@ namespace prlrt {
 	V(::prlrt::uievent_state, Event_GetUserState)\
 	V(void, Event_Push, uint32_t id, const char* pData, uint32_t dataLen)\
 	V(void, Event_Notify, uint32_t id, const char* pData, uint32_t dataLen)\
-	V(void, Event_Exception, const char *msg, ::prlrt::ExceptionType exc_type)
+	V(void, Event_Exception, const char *msg, ::prlrt::ExceptionType exc_type)\
+\
+	/*  util context */\
+	V(void, Util_SHA3, const uint8_t* data, uint32_t data_len, uint8_t* out, uint32_t out_len)\
+	V(void, Util_MD5, const uint8_t* data, uint32_t data_len, uint8_t* out, uint32_t out_len)\
+	V(void, Util_SM3, const uint8_t* data, uint32_t data_len, uint8_t* out, uint32_t out_len)\
+	V(void, Util_SM4Enc, const uint8_t* data, uint32_t data_len, const uint8_t* key, uint32_t key_len, uint8_t* out, uint32_t out_len)\
+	V(void, Util_SM4Dec, const uint8_t* encrypted, uint32_t encrypted_len, const uint8_t* key, uint32_t key_len, uint8_t* out, uint32_t& out_len)\
+	V(void, Util_SM2Sign, const uint8_t* data, uint32_t data_len, const uint8_t* private_key,  uint32_t key_len, uint8_t* out, uint32_t out_len) \
+	V(bool, Util_SM2Verify, const uint8_t* data, uint32_t data_len, const uint8_t* signature, uint32_t signature_len, const uint8_t* public_key, uint32_t key_len)
 
 #if defined(__wasm32__)
 #define PREDA_INTERFACE_METHOD_V(RET, FN, ...) RET preda##FN(__VA_ARGS__);

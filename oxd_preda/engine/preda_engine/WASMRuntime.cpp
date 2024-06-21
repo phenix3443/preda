@@ -874,6 +874,80 @@ std::optional<wasmtime::Linker> WASMRuntime::CreateBaseLinker(CExecutionEngine& 
 		return {};
 	}
 
+	if (!linker.func_wrap("env", "predaUtil_SHA3",
+		[&engine](wasmtime::Caller caller, WasmPtrT data_offset, uint32_t data_len, WasmPtrT out_offset, uint32_t out_len) -> void {
+			wasmtime::Span<uint8_t> mem = engine.wasm_runtime()->memory().data(caller.context());
+			const uint8_t* data = WasmPtrToPtr<const uint8_t*>(mem, data_offset);
+			uint8_t* out = WasmPtrToPtr<uint8_t*>(mem, out_offset);
+			return engine.runtimeInterface().Util_SHA3(data, data_len, out, out_len);
+		})) {
+		return {};
+	}
+
+	if (!linker.func_wrap("env", "predaUtil_MD5",
+		[&engine](wasmtime::Caller caller, WasmPtrT data_offset, uint32_t data_len, WasmPtrT out_offset, uint32_t out_len) -> void {
+			wasmtime::Span<uint8_t> mem = engine.wasm_runtime()->memory().data(caller.context());
+			const uint8_t* data = WasmPtrToPtr<const uint8_t*>(mem, data_offset);
+			uint8_t* out = WasmPtrToPtr<uint8_t*>(mem, out_offset);
+			return engine.runtimeInterface().Util_MD5(data, data_len, out, out_len);
+		})) {
+		return {};
+	}
+
+	if (!linker.func_wrap("env", "predaUtil_SM3",
+		[&engine](wasmtime::Caller caller, WasmPtrT data_offset, uint32_t data_len, WasmPtrT out_offset, uint32_t out_len) -> void {
+			wasmtime::Span<uint8_t> mem = engine.wasm_runtime()->memory().data(caller.context());
+			const uint8_t* data = WasmPtrToPtr<const uint8_t*>(mem, data_offset);
+			uint8_t* out = WasmPtrToPtr<uint8_t*>(mem, out_offset);
+			return engine.runtimeInterface().Util_SM3(data, data_len, out, out_len);
+		})) {
+		return {};
+	}
+	
+	if (!linker.func_wrap("env", "predaUtil_SM4Enc",
+		[&engine](wasmtime::Caller caller, WasmPtrT data_offset, uint32_t data_len, WasmPtrT key_offset, uint32_t key_len,  WasmPtrT out_offset, uint32_t out_len) -> void {
+			wasmtime::Span<uint8_t> mem = engine.wasm_runtime()->memory().data(caller.context());
+			const uint8_t* data = WasmPtrToPtr<const uint8_t*>(mem, data_offset);
+			const uint8_t* key = WasmPtrToPtr<const uint8_t*>(mem, key_offset);
+			uint8_t* out = WasmPtrToPtr<uint8_t*>(mem, out_offset);
+			return engine.runtimeInterface().Util_SM4Enc(data, data_len, key, key_len, out, out_len);
+		})) {
+		return {};
+	}
+
+	if (!linker.func_wrap("env", "predaUtil_SM4Dec",
+		[&engine](wasmtime::Caller caller, WasmPtrT data_offset, uint32_t data_len, WasmPtrT key_offset, uint32_t key_len,  WasmPtrT out_offset, WasmPtrT out_len_offset) -> void {
+			wasmtime::Span<uint8_t> mem = engine.wasm_runtime()->memory().data(caller.context());
+			const uint8_t* data = WasmPtrToPtr<const uint8_t*>(mem, data_offset);
+			const uint8_t* key = WasmPtrToPtr<const uint8_t*>(mem, key_offset);
+			uint8_t* out = WasmPtrToPtr<uint8_t*>(mem, out_offset);
+			uint32_t* out_len = WasmPtrToPtr<uint32_t*>(mem, out_len_offset);
+			return engine.runtimeInterface().Util_SM4Dec(data, data_len, key, key_len, out, *out_len);
+		})) {
+		return {};
+	}
+
+	if (!linker.func_wrap("env", "predaUtil_SM2Sign",
+		[&engine](wasmtime::Caller caller, WasmPtrT data_offset, uint32_t data_len, WasmPtrT key_offset, uint32_t key_len,  WasmPtrT out_offset, uint32_t out_len) -> void {
+			wasmtime::Span<uint8_t> mem = engine.wasm_runtime()->memory().data(caller.context());
+			const uint8_t* data = WasmPtrToPtr<const uint8_t*>(mem, data_offset);
+			const uint8_t* key = WasmPtrToPtr<const uint8_t*>(mem, key_offset);
+			uint8_t* out = WasmPtrToPtr<uint8_t*>(mem, out_offset);
+			return engine.runtimeInterface().Util_SM2Sign(data, data_len, key, key_len, out, out_len);
+		})) {
+		return {};
+	}
+
+	if (!linker.func_wrap("env", "predaUtil_SM2Verify",
+		[&engine](wasmtime::Caller caller, WasmPtrT data_offset, uint32_t data_len, WasmPtrT signature_offset, uint32_t signature_len, WasmPtrT key_offset, uint32_t key_len) -> uint32_t {
+			wasmtime::Span<uint8_t> mem = engine.wasm_runtime()->memory().data(caller.context());
+			const uint8_t* data = WasmPtrToPtr<const uint8_t*>(mem, data_offset);
+			const uint8_t* signature = WasmPtrToPtr<const uint8_t*>(mem, signature_offset);
+			const uint8_t* key = WasmPtrToPtr<const uint8_t*>(mem, key_offset);
+			return engine.runtimeInterface().Util_SM2Verify(data, data_len, signature, signature_len, key, key_len);
+		})) {
+		return {};
+	}
 
 	return linker;
 }
