@@ -305,14 +305,6 @@ namespace transpiler {
 			{
 				FunctionSignature signature;
 				signature.flags = uint32_t(FunctionFlags::IsConst);
-				signature.returnType = QualifiedConcreteType(pTranspilerContext->GetBuiltInStringType(), true, false);
-				signature.parameters.push_back(Allocator::New<DefinedIdentifier>(pTranspilerContext->GetBuiltInStringType(), true, true, "data", 0));
-				res = res && (DefineMemberFunction("sha3", signature, false) != nullptr);
-			}
-
-			{
-				FunctionSignature signature;
-				signature.flags = uint32_t(FunctionFlags::IsConst);
 				signature.returnType = QualifiedConcreteType(arrayOfUint8Type, true, false);
 				signature.parameters.push_back(Allocator::New<DefinedIdentifier>(arrayOfUint8Type, true, true, "data", 0));
 				res = res && (DefineMemberFunction("md5", signature, false) != nullptr);
@@ -321,24 +313,8 @@ namespace transpiler {
 			{
 				FunctionSignature signature;
 				signature.flags = uint32_t(FunctionFlags::IsConst);
-				signature.returnType = QualifiedConcreteType(pTranspilerContext->GetBuiltInStringType(), true, false);
-				signature.parameters.push_back(Allocator::New<DefinedIdentifier>(pTranspilerContext->GetBuiltInStringType(), true, true, "data", 0));
-				res = res && (DefineMemberFunction("md5", signature, false) != nullptr);
-			}
-
-			{
-				FunctionSignature signature;
-				signature.flags = uint32_t(FunctionFlags::IsConst);
 				signature.returnType = QualifiedConcreteType(arrayOfUint8Type, true, false);
 				signature.parameters.push_back(Allocator::New<DefinedIdentifier>(arrayOfUint8Type, true, true, "data", 0));
-				res = res && (DefineMemberFunction("sm3", signature, false) != nullptr);
-			}
-
-			{
-				FunctionSignature signature;
-				signature.flags = uint32_t(FunctionFlags::IsConst);
-				signature.returnType = QualifiedConcreteType(pTranspilerContext->GetBuiltInStringType(), true, false);
-				signature.parameters.push_back(Allocator::New<DefinedIdentifier>(pTranspilerContext->GetBuiltInStringType(), true, true, "data", 0));
 				res = res && (DefineMemberFunction("sm3", signature, false) != nullptr);
 			}
 
@@ -354,27 +330,9 @@ namespace transpiler {
 			{
 				FunctionSignature signature;
 				signature.flags = uint32_t(FunctionFlags::IsConst);
-				signature.returnType = QualifiedConcreteType(pTranspilerContext->GetBuiltInStringType(), true, false);
-				signature.parameters.push_back(Allocator::New<DefinedIdentifier>(pTranspilerContext->GetBuiltInStringType(), true, true, "data", 0));
-				signature.parameters.push_back(Allocator::New<DefinedIdentifier>(pTranspilerContext->GetBuiltInStringType(), true, true, "key", 0));
-				res = res && (DefineMemberFunction("sm4_enc", signature, false) != nullptr);
-			}
-
-			{
-				FunctionSignature signature;
-				signature.flags = uint32_t(FunctionFlags::IsConst);
 				signature.returnType = QualifiedConcreteType(arrayOfUint8Type, true, false);
 				signature.parameters.push_back(Allocator::New<DefinedIdentifier>(arrayOfUint8Type, true, true, "data", 0));
 				signature.parameters.push_back(Allocator::New<DefinedIdentifier>(arrayOfUint8Type, true, true, "key", 0));
-				res = res && (DefineMemberFunction("sm4_dec", signature, false) != nullptr);
-			}
-
-			{
-				FunctionSignature signature;
-				signature.flags = uint32_t(FunctionFlags::IsConst);
-				signature.returnType = QualifiedConcreteType(pTranspilerContext->GetBuiltInStringType(), true, false);
-				signature.parameters.push_back(Allocator::New<DefinedIdentifier>(pTranspilerContext->GetBuiltInStringType(), true, true, "data", 0));
-				signature.parameters.push_back(Allocator::New<DefinedIdentifier>(pTranspilerContext->GetBuiltInStringType(), true, true, "key", 0));
 				res = res && (DefineMemberFunction("sm4_dec", signature, false) != nullptr);
 			}
 
@@ -390,29 +348,10 @@ namespace transpiler {
 			{
 				FunctionSignature signature;
 				signature.flags = uint32_t(FunctionFlags::IsConst);
-				signature.returnType = QualifiedConcreteType(pTranspilerContext->GetBuiltInStringType(), true, false);
-				signature.parameters.push_back(Allocator::New<DefinedIdentifier>(pTranspilerContext->GetBuiltInStringType(), true, true, "data", 0));
-				signature.parameters.push_back(Allocator::New<DefinedIdentifier>(pTranspilerContext->GetBuiltInStringType(), true, true, "private_key", 0));
-				res = res && (DefineMemberFunction("sm2_sign", signature, false) != nullptr);
-			}
-
-			{
-				FunctionSignature signature;
-				signature.flags = uint32_t(FunctionFlags::IsConst);
 				signature.returnType = QualifiedConcreteType(pTranspilerContext->GetBuiltInBoolType(), true, false);
 				signature.parameters.push_back(Allocator::New<DefinedIdentifier>(arrayOfUint8Type, true, true, "data", 0));
 				signature.parameters.push_back(Allocator::New<DefinedIdentifier>(arrayOfUint8Type, true, true, "sign", 0));
 				signature.parameters.push_back(Allocator::New<DefinedIdentifier>(arrayOfUint8Type, true, true, "public_key", 0));
-				res = res && (DefineMemberFunction("sm2_verify", signature, false) != nullptr);
-			}
-
-			{
-				FunctionSignature signature;
-				signature.flags = uint32_t(FunctionFlags::IsConst);
-				signature.returnType = QualifiedConcreteType(pTranspilerContext->GetBuiltInBoolType(), true, false);
-				signature.parameters.push_back(Allocator::New<DefinedIdentifier>(pTranspilerContext->GetBuiltInStringType(), true, true, "data", 0));
-				signature.parameters.push_back(Allocator::New<DefinedIdentifier>(pTranspilerContext->GetBuiltInStringType(), true, true, "sign", 0));
-				signature.parameters.push_back(Allocator::New<DefinedIdentifier>(pTranspilerContext->GetBuiltInStringType(), true, true, "public_key", 0));
 				res = res && (DefineMemberFunction("sm2_verify", signature, false) != nullptr);
 			}
 
