@@ -99,6 +99,10 @@ public:
     return visitChildren(ctx);
   }
 
+  virtual antlrcpp::Any visitEventDeclaration(PredaParser::EventDeclarationContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
   virtual antlrcpp::Any visitVariableDeclaration(PredaParser::VariableDeclarationContext *ctx) override {
     return visitChildren(ctx);
   }
@@ -144,6 +148,10 @@ public:
   }
 
   virtual antlrcpp::Any visitExpressionStatement(PredaParser::ExpressionStatementContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual antlrcpp::Any visitEventStatement(PredaParser::EventStatementContext *ctx) override {
     return visitChildren(ctx);
   }
 

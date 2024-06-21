@@ -58,7 +58,7 @@ int SimulatorMain(const os::CommandLine& cmd)
 	}
 	else if(!lockfile.Lock())
 	{
-		_LOG("Another chain simulator is runnig. Please wait until the other job is finished");
+		_LOG("Another chain simulator is running. Please wait until the other job is finished");
 		return 1;
 	}
 	if(cmd.GetTextCount() == 0)
@@ -822,8 +822,8 @@ bool Simulator::_ProcessIdentifierRequest(const CmdParse& cmd, rt::String& id_na
 	id_name = cmd.Args.SubStr(0, lbracket_pos);
 	if(!_TxnPool.has(id_name) || !_TxnPool.get(id_name).GetSize())
 	{
-		_LOG_WARNING("[PRD] Line " << GetLineNum() << ": Identitifer does not exist")
-			return false;
+		_LOG_WARNING("[PRD] Line " << GetLineNum() << ": Identifier does not exist")
+		return false;
 	}
 
 	if(lbracket_exist && cmd.Args.Last() != ']')
@@ -1350,7 +1350,7 @@ rvm::InvokeResult Simulator::DeployFromStatement(const rt::String_Ref& deploySta
 			p += seg_end + 1;
 			continue;
 		}
-		_LOG_WARNING("[PPD] Line " << GetLineNum() << ": Deploy arguemnt of `" << filename << "` are ill-formatted");
+		_LOG_WARNING("[PPD] Line " << GetLineNum() << ": Deploy argument of `" << filename << "` are ill-formatted");
 		return ret;
 	}
 
@@ -1546,7 +1546,7 @@ Simulator::TargetParse::TargetParse(const rt::String_Ref& arg_part, rvm::Scope s
 			ArgsJson = rt::String_Ref(Target.End(), ArgsJson.End()).TrimSpace();
 			if(ArgsJson.IsEmpty())
 			{
-				_LOG_WARNING("[PRD] Line " << LineNum << ": Missing argments json");
+				_LOG_WARNING("[PRD] Line " << LineNum << ": Missing arguments json");
 				Target.Empty();
 			}
 		}
@@ -1672,7 +1672,7 @@ bool Simulator::_ExecState(const CmdParse& cmd)
 		else if(op[0] == "global"){ scope = rvm::Scope::Global; }
 		else
 		{
-			_LOG("[PRD] Line " << GetLineNum() << ": '"<<op[0]<<" is not a legal state identifier, which should be `addess/shard/global.[ContractName]`");
+			_LOG("[PRD] Line " << GetLineNum() << ": '" << op[0] << " is not a legal state identifier, which should be `address/shard/global.[ContractName]`");
 			return false;
 		}
 

@@ -233,7 +233,8 @@ namespace transpiler {
 	//   placeholder for unnamed scopes
 	struct ConcreteType : public std::enable_shared_from_this<ConcreteType>
 	{
-		enum TypeCategory {
+		enum TypeCategory
+		{
 			ValueType,
 			ReferenceType,
 			EnumType,
@@ -256,6 +257,7 @@ namespace transpiler {
 		std::vector<DefinedIdentifierPtr> members;
 		std::vector<bool> vbMemberIsStatic;
 		std::vector<FunctionSignature> vOverloadedFunctions;												// the list of functions overloaded under the name of this variable
+
 		std::vector<std::pair<DefinedIdentifierPtr, size_t>> vInterfaceMemberFuncIndexMapping;				// for interface types, this maps the function index to the corresponding member and overload index
 		ConcreteTypePtr outerType;																			// outer type
 		std::map<std::string, ConcreteTypePtr> innerConcreteTypes;											// inner concrete types defined under this type
@@ -282,7 +284,7 @@ namespace transpiler {
 		ConcreteTypePtr CreateInnerUserDefinedStructType(const std::string &typeName);
 		ConcreteTypePtr CreateInnerEnumType(const std::string &typeName);
 		ConcreteTypePtr CreateInnerAliasType(const std::string &typeName, ConcreteTypePtr realType);
-		ConcreteTypePtr CreateInnerInterfaceType(const std::string& typeName);
+		ConcreteTypePtr CreateInnerInterfaceType(const std::string &typeName);
 
 		bool IsConstTransitive()
 		{
@@ -290,4 +292,33 @@ namespace transpiler {
 		}
 	};
 
+	struct EventSignature
+	{
+		std::vector<DefinedIdentifierPtr> parameters;
+		std::string doxygenComment;
+
+		EventSignature()
+		{
+		}
+
+		EventSignature(const std::vector<DefinedIdentifierPtr> &inParameters)
+		{
+			parameters = inParameters;
+		}
+
+		bool operator==(const EventSignature &other) const
+		{
+			// Only compare parameter list
+			if (parameters.size() != other.parameters.size())
+				return false;
+			for (size_t i = 0; i < parameters.size(); i++)
+			{
+				// only compare type, ignore the const-qualifier
+				if (parameters[i]->qualifiedType.baseConcreteType != other.parameters[i]->qualifiedType.baseConcreteType)
+					return false;
+			}
+
+			return true;
+		}
+	};
 }

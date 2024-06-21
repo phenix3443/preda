@@ -77,6 +77,9 @@ public:
   virtual void enterAccessSpecifier(PredaParser::AccessSpecifierContext *ctx) = 0;
   virtual void exitAccessSpecifier(PredaParser::AccessSpecifierContext *ctx) = 0;
 
+  virtual void enterEventDeclaration(PredaParser::EventDeclarationContext *ctx) = 0;
+  virtual void exitEventDeclaration(PredaParser::EventDeclarationContext *ctx) = 0;
+
   virtual void enterVariableDeclaration(PredaParser::VariableDeclarationContext *ctx) = 0;
   virtual void exitVariableDeclaration(PredaParser::VariableDeclarationContext *ctx) = 0;
 
@@ -112,6 +115,9 @@ public:
 
   virtual void enterExpressionStatement(PredaParser::ExpressionStatementContext *ctx) = 0;
   virtual void exitExpressionStatement(PredaParser::ExpressionStatementContext *ctx) = 0;
+
+  virtual void enterEventStatement(PredaParser::EventStatementContext *ctx) = 0;
+  virtual void exitEventStatement(PredaParser::EventStatementContext *ctx) = 0;
 
   virtual void enterIfStatement(PredaParser::IfStatementContext *ctx) = 0;
   virtual void exitIfStatement(PredaParser::IfStatementContext *ctx) = 0;

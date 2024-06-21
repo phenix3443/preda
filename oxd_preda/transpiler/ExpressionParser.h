@@ -42,6 +42,7 @@ private:
 	bool ValidateExpressionResult(const ExpressionResult &result);
 
 public:
+	bool GenerateEventNotifyArguments(PredaParser::EventStatementContext *ctx, std::string &outSynthesizedArgumentsString);
 	void SetTranspilerContext(transpiler::PredaTranspilerContext *pCtx)
 	{
 		m_pTranspilerCtx = pCtx;

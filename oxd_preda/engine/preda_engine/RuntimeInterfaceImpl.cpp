@@ -263,7 +263,7 @@ void CRuntimeInterface::PushContractStack(const rvm::ContractModuleID &moduleId,
 	ContractStackEntry entry;
 	entry.moduleId = moduleId;
 	entry.cvId = cvId;
-	entry.funtionFlags = functionFlags;
+	entry.functionFlags = functionFlags;
 	entry.importedCvIds = importedCvId;
 	entry.numImportedContracts = numImportedContracts;
 	m_contractStack.push_back(entry);
@@ -887,6 +887,26 @@ prlrt::uievent_state CRuntimeInterface::Event_GetUserState()
 
 void CRuntimeInterface::Event_Notify(uint32_t, const char*, uint32_t)
 {
+}
+
+void CRuntimeInterface::EventEmitBufferAppendSerializedData(const char *type_export_name, const uint8_t *serialized_data, uint32_t serialized_data_size)
+{
+	if (type_export_name == nullptr || serialized_data == nullptr)
+		return;
+
+	std::string outputStr;
+	bool res = m_pDB->VariableJsonify(m_contractStack.back().moduleId, type_export_name, serialized_data, serialized_data_size, outputStr, m_pChainState);
+	assert(res);
+
+	m_eventBuffer += outputStr;
+}
+
+void CRuntimeInterface::EventEmit(const char *eventName, size_t nameLen)
+{
+	std::string tmp = std::string(eventName, nameLen) + " emitted: " + m_eventBuffer;
+	rvm::ConstString s{tmp.c_str(), uint32_t(tmp.size())};
+	m_pDB->m_pRuntimeAPI->DebugPrint(rvm::DebugMessageType::Warning, &s, m_pExecutionContext, m_pDB->GetContract(&m_contractStack.back().moduleId));
+	m_eventBuffer.clear();
 }
 
 void CRuntimeInterface::Event_Exception(const char* msg, prlrt::ExceptionType exc_type)

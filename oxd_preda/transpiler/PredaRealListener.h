@@ -26,7 +26,7 @@ class PredaPreCompileListener : public PredaBaseListener {
 			m_currentDAppName = dAppName;
 		}
 
-		std::vector<std::string> m_dependentContracts;
+		std::vector < std::pair<std::string, std::vector<transpiler::EventSignature>> m_dependentContracts;
 };
 
 class PredaRealListener : public PredaBaseListener, public antlr4::BaseErrorListener {
@@ -61,6 +61,7 @@ public:
 	std::vector<std::pair<PredaParser::StructDefinitionContext*, ConcreteTypePtr>> m_definedStructs;
 	std::vector<std::pair<PredaParser::EnumDefinitionContext*, ConcreteTypePtr>> m_definedEnums;
 	std::vector<ConcreteTypePtr> m_definedInterfaces;
+	std::map<PredaParser::EventDeclarationContext *, std::vector<transpiler::EventSignature>> m_definedEvents;
 
 	ErrorPortal m_errorPortal;
 	IdentifierHub m_identifierHub;
@@ -221,6 +222,11 @@ private:
 	size_t ExportFunction(transpiler::FunctionRef functionRef);
 	void PropagateFunctionFlagAcrossCallingGraph();
 	void TraverseAllFunctions();
+	void DeclareEvent(PredaParser::EventDeclarationContext *ctx);
+	bool GenEventSignatureFromEventDeclareCtx(PredaParser::EventDeclarationContext* ctx,transpiler::EventSignature &outSig);
+	bool GenEventSignatureFromEventStatementCtx(PredaParser::EventStatementContext* ctx,transpiler::EventSignature &outSig);
+	bool GenerateEventNotifyArguments(PredaParser::EventStatementContext *ctx, std::string &outSynthesizedArgumentsString);
+	int FindMatchingOverloadedEvent(std::string eventName, std::string &outSynthesizedArgumentsString);
 
 public:
 	// interface inherited from PredaListener
@@ -258,4 +264,6 @@ public:
 	//virtual void exitRelayLambdaDefinition(PredaParser::RelayLambdaDefinitionContext *ctx) override;
 	virtual void enterPredaSource(PredaParser::PredaSourceContext * /*ctx*/) override;
   	//virtual void enterDoxygen(PredaParser::DoxygenContext * /*ctx*/) override;
+
+	virtual void enterEventStatement(PredaParser::EventStatementContext *ctx) override;
 };

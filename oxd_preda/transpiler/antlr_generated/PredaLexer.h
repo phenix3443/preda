@@ -28,11 +28,12 @@ public:
     ContractKeyword = 73, ImportKeyword = 74, FunctionKeyword = 75, PublicKeyword = 76, 
     ExportKeyword = 77, AsKeyword = 78, UsingKeyword = 79, InterfaceKeyword = 80, 
     ImplementsKeyword = 81, DeployKeyword = 82, ConstructorKeyword = 83, 
-    FloatType = 84, IntType = 85, UintType = 86, BooleanLiteral = 87, DecimalFloatLiteral = 88, 
-    DecimalIntegerLiteral = 89, DecimalIntegerLiteralBody = 90, AddressLiteral = 91, 
-    HashLiteral = 92, HexIntegerLiteral = 93, HexIntegerLiteralBody = 94, 
-    DecimalBigIntegerLiteral = 95, HexBigIntegerLiteral = 96, Identifier = 97, 
-    StringLiteral = 98, WS = 99, COMMENT = 100, LINE_COMMENT = 101
+    EventKeyword = 84, EmitKeyword = 85, FloatType = 86, IntType = 87, UintType = 88, 
+    BooleanLiteral = 89, DecimalFloatLiteral = 90, DecimalIntegerLiteral = 91, 
+    DecimalIntegerLiteralBody = 92, AddressLiteral = 93, HashLiteral = 94, 
+    HexIntegerLiteral = 95, HexIntegerLiteralBody = 96, DecimalBigIntegerLiteral = 97, 
+    HexBigIntegerLiteral = 98, Identifier = 99, StringLiteral = 100, WS = 101, 
+    COMMENT = 102, LINE_COMMENT = 103
   };
 
   explicit PredaLexer(antlr4::CharStream *input);

@@ -356,18 +356,18 @@ enum class InvokeContextType : uint8_t
 
 enum class InvokeErrorCode : uint8_t
 {
-	Success = 0, // Execution success, otherwise any committed states and generated relay txns will be discarded.
-	Unspecified, // error code is not specified
+	Success = 0,	   // Execution success, otherwise any committed states and generated relay txns will be discarded.
+	Unspecified,	   // error code is not specified
 	InsufficientFunds, // insufficient funds for withdraw
-	InsufficientGas, // Gas supplied < minimum requirement of the gas, which is determined without execution
-	RunOutOfGas, // Gas runs out before execution of the the contract function is completed
-	AssertionFailed, // explicit assertion defined in contract code
-	ExceptionThrown, // exception trigger implicitly like divide-by-zero, thrown from underlying libraries
+	InsufficientGas,   // Gas supplied < minimum requirement of the gas, which is determined without execution
+	RunOutOfGas,	   // Gas runs out before execution of the the contract function is completed
+	AssertionFailed,   // explicit assertion defined in contract code
+	ExceptionThrown,   // exception trigger implicitly like divide-by-zero, thrown from underlying libraries
 	ExecutionEngineUnavailable,
 	ContractUnavailable,
 	ContractFunctionUnavailable,
 	ContractFunctionDisallowed,
-	InvalidFunctionArgments,
+	InvalidFunctionArguments,
 	// Blue Screen Error
 	BlueScreenErrorBegin = 200,
 	InternalError = BlueScreenErrorBegin,
@@ -483,7 +483,7 @@ STRINGIFY_ENUM_BEGIN(InvokeErrorCode, rvm)
 	STRINGIFY_ENUM(ContractUnavailable)
 	STRINGIFY_ENUM(ContractFunctionUnavailable)
 	STRINGIFY_ENUM(ContractFunctionDisallowed)
-	STRINGIFY_ENUM(InvalidFunctionArgments)
+	STRINGIFY_ENUM(InvalidFunctionArguments)
 	STRINGIFY_ENUM(InternalError)
 	STRINGIFY_ENUM(OutOfMemory)
 	STRINGIFY_ENUM(LoadStateFailure)

@@ -870,7 +870,7 @@ void PredaRealListener::enterReturnStatement(PredaParser::ReturnStatementContext
 
 void PredaRealListener::enterIfWithBlock(PredaParser::IfWithBlockContext *ctx)
 {
-	m_transpilerCtx.functionCtx.PushAddtionalLocalScope(transpiler::FunctionContext::LocalScope::Scope_If, "if");
+	m_transpilerCtx.functionCtx.PushAdditionalLocalScope(transpiler::FunctionContext::LocalScope::Scope_If, "if");
 
 	ExpressionParser::ExpressionResult expRes;
 	if (!m_expressionParser.ParseExpression(ctx->expression(), expRes))
@@ -897,7 +897,7 @@ void PredaRealListener::exitIfWithBlock(PredaParser::IfWithBlockContext *ctx)
 
 void PredaRealListener::enterElseWithBlock(PredaParser::ElseWithBlockContext *ctx)
 {
-	m_transpilerCtx.functionCtx.PushAddtionalLocalScope(transpiler::FunctionContext::LocalScope::Scope_Else, "else");
+	m_transpilerCtx.functionCtx.PushAdditionalLocalScope(transpiler::FunctionContext::LocalScope::Scope_Else, "else");
 
 	codeSerializer.AddLine("else {");
 	codeSerializer.PushIndent();
@@ -913,7 +913,7 @@ void PredaRealListener::exitElseWithBlock(PredaParser::ElseWithBlockContext *ctx
 
 void PredaRealListener::enterElseIfWithBlock(PredaParser::ElseIfWithBlockContext *ctx)
 {
-	m_transpilerCtx.functionCtx.PushAddtionalLocalScope(transpiler::FunctionContext::LocalScope::Scope_ElseIf, "elseif");
+	m_transpilerCtx.functionCtx.PushAdditionalLocalScope(transpiler::FunctionContext::LocalScope::Scope_ElseIf, "elseif");
 
 	ExpressionParser::ExpressionResult expRes;
 	if (!m_expressionParser.ParseExpression(ctx->expression(), expRes))
@@ -940,7 +940,7 @@ void PredaRealListener::exitElseIfWithBlock(PredaParser::ElseIfWithBlockContext 
 
 void PredaRealListener::enterWhileStatement(PredaParser::WhileStatementContext *ctx)
 {
-	m_transpilerCtx.functionCtx.PushAddtionalLocalScope(transpiler::FunctionContext::LocalScope::Scope_While, "while");
+	m_transpilerCtx.functionCtx.PushAdditionalLocalScope(transpiler::FunctionContext::LocalScope::Scope_While, "while");
 
 	ExpressionParser::ExpressionResult expRes;
 	if (!m_expressionParser.ParseExpression(ctx->expression(), expRes))
@@ -967,7 +967,7 @@ void PredaRealListener::exitWhileStatement(PredaParser::WhileStatementContext *c
 
 void PredaRealListener::enterDoWhileStatement(PredaParser::DoWhileStatementContext *ctx)
 {
-	m_transpilerCtx.functionCtx.PushAddtionalLocalScope(transpiler::FunctionContext::LocalScope::Scope_DoWhile, "dowhile");
+	m_transpilerCtx.functionCtx.PushAdditionalLocalScope(transpiler::FunctionContext::LocalScope::Scope_DoWhile, "dowhile");
 
 	codeSerializer.AddLine("do { prlrt::burn_gas_loop();");
 	codeSerializer.PushIndent();
@@ -994,7 +994,7 @@ void PredaRealListener::exitDoWhileStatement(PredaParser::DoWhileStatementContex
 
 void PredaRealListener::enterForStatement(PredaParser::ForStatementContext *ctx)
 {
-	m_transpilerCtx.functionCtx.PushAddtionalLocalScope(transpiler::FunctionContext::LocalScope::Scope_For, "for");
+	m_transpilerCtx.functionCtx.PushAdditionalLocalScope(transpiler::FunctionContext::LocalScope::Scope_For, "for");
 
 	std::string codeOutput = "for (";
 
@@ -1057,7 +1057,7 @@ void PredaRealListener::exitForStatement(PredaParser::ForStatementContext *ctx)
 
 void PredaRealListener::enterUserBlockStatement(PredaParser::UserBlockStatementContext *ctx)
 {
-	m_transpilerCtx.functionCtx.PushAddtionalLocalScope(transpiler::FunctionContext::LocalScope::Scope_UserBlock, "userblock");
+	m_transpilerCtx.functionCtx.PushAdditionalLocalScope(transpiler::FunctionContext::LocalScope::Scope_UserBlock, "userblock");
 
 	codeSerializer.AddLine("{");
 	codeSerializer.PushIndent();
@@ -1599,11 +1599,11 @@ void PredaRealListener::ForwardDeclareFunction(PredaParser::FunctionDefinitionCo
 		return;
 	}
 
-	ForwardDeclaredContractFunction forwardDeclearedFunc;
-	forwardDeclearedFunc.declaredFunc.functionIdentifier = pDefinedFunction;
-	forwardDeclearedFunc.declaredFunc.overloadIndex = pDefinedFunction->qualifiedType.baseConcreteType->vOverloadedFunctions.size() - 1;
-	forwardDeclearedFunc.ctx = ctx;
-	m_forwardDeclaredFunctions.push_back(forwardDeclearedFunc);
+	ForwardDeclaredContractFunction forwardDeclaredFunc;
+	forwardDeclaredFunc.declaredFunc.functionIdentifier = pDefinedFunction;
+	forwardDeclaredFunc.declaredFunc.overloadIndex = pDefinedFunction->qualifiedType.baseConcreteType->vOverloadedFunctions.size() - 1;
+	forwardDeclaredFunc.ctx = ctx;
+	m_forwardDeclaredFunctions.push_back(forwardDeclaredFunc);
 	m_functionDefinitionContext2ForwardDeclaredFunctions.insert(std::make_pair(ctx, m_forwardDeclaredFunctions.size() - 1));
 
 	// generate export signature
@@ -1617,7 +1617,7 @@ void PredaRealListener::ForwardDeclareFunction(PredaParser::FunctionDefinitionCo
 
 	if (bNeedToExport)
 	{
-		size_t exportSlot = ExportFunction(forwardDeclearedFunc.declaredFunc);
+		size_t exportSlot = ExportFunction(forwardDeclaredFunc.declaredFunc);
 
 		// reserved functions are only for contracts
 		if (thisType->typeCategory == transpiler::ConcreteType::ContractType)
@@ -1809,9 +1809,9 @@ void PredaRealListener::DefineStruct(PredaParser::StructDefinitionContext *ctx)
 	// struct members cannot reference the struct type itself. Therefore their types are checked before defining the struct type.
 	std::vector<ConcreteTypePtr> memberTypes;
 	{
-		std::vector<PredaParser::VariableDeclarationContext*> memberVariableDclarations = ctx->variableDeclaration();
-		for (size_t i = 0; i < memberVariableDclarations.size(); i++)
-			 memberTypes.push_back(m_identifierHub.GetTypeFromTypeNameContext(memberVariableDclarations[i]->typeName()));
+		std::vector<PredaParser::VariableDeclarationContext *> memberVariableDeclarations = ctx->variableDeclaration();
+		for (size_t i = 0; i < memberVariableDeclarations.size(); i++)
+			memberTypes.push_back(m_identifierHub.GetTypeFromTypeNameContext(memberVariableDeclarations[i]->typeName()));
 	}
 
 	// Register the struct type
@@ -2008,6 +2008,10 @@ void PredaRealListener::enterContractDefinition(PredaParser::ContractDefinitionC
 		else if (contractParts[i]->constVariableDeclaration())
 		{
 			DefineConstVariable(contractParts[i]->constVariableDeclaration());
+		}
+		else if (contractParts[i]->eventDeclaration())
+		{
+			DeclareEvent(contractParts[i]->eventDeclaration());
 		}
 	}
 
@@ -3290,3 +3294,216 @@ bool PredaPreCompileListener::ProcessImportDirective(const PredaParser::ImportDi
 	return true;
 }
 
+void PredaRealListener::DeclareEvent(PredaParser::EventDeclarationContext *ctx)
+{
+	std::string eventName = ctx->identifier()->getText();
+	if (!m_identifierHub.ValidateNewIdentifier(ctx->identifier()))
+	{
+		return;
+	}
+	if (std::find(m_definedEvents.begin(), m_definedEvents.end(), eventName) != m_definedEvents.end())
+	{
+		m_errorPortal.SetAnchor(ctx->identifier()->start);
+		m_errorPortal.AddEventRedefinitionError(eventName);
+		return;
+	}
+	std::string eventOutSynthesizedArgumentsString;
+	int index = FindMatchingOverloadedEvent(ctx, eventOutSynthesizedArgumentsString);
+	if (index != -1)
+	{
+		m_errorPortal.SetAnchor(ctx->identifier()->start);
+		m_errorPortal.AddEventRedefinitionError(eventName, index);
+		return;
+	}
+	// if (m_definedEvents.find(ctx) == m_definedEvents.end())
+	// {
+	// 	m_definedEvents[ctx] = std::vector<transpiler::EventSignature>();
+	// }
+
+	transpiler::EventSignature signature;
+	if (!GenEventSignatureFromEventDeclareCtx(signature, ctx))
+		return;
+
+	m_definedEvents[ctx].push_back(signature);
+}
+
+void PredaRealListener::enterEventStatement(PredaParser::EventStatementContext *ctx)
+{
+	std::string expRes;
+	if (!GenerateEventNotifyArguments(ctx, expRes))
+	{
+		m_errorPortal.SetAnchor(ctx->identifier()->start);
+		m_errorPortal.AddEventCallMissingArgumentListError();
+		return;
+	}
+	std::ostringstream oss;
+	oss << "__prli___event.__prli_emit(" << expRes << ");";
+	std::string codeOutput = oss.str();
+	codeSerializer.AddLine(codeOutput);
+}
+
+bool PredaRealListener::GenerateEventNotifyArguments(PredaParser::EventStatementContext *ctx, std::string &outSynthesizedArgumentsString)
+{
+	std::string eventName = ctx->identifier()->getText();
+	std::vector<PredaParser::ExpressionContext *> argCtxs = ctx->functionCallArguments()->expression();
+
+	std::stringstream ss;
+	ss << std::quoted(eventName);
+
+	for (size_t i = 0; i < argCtxs.size(); i++)
+	{
+		ExpressionParser::ExpressionResult arg;
+		if (!m_expressionParser.ParseExpression(argCtxs[i], arg))
+			return false;
+
+		// skip arguments that are of void type
+		if (arg.type.baseConcreteType == nullptr)
+			continue;
+		ss << "," << std::quoted(arg.type.baseConcreteType->exportName) << "," << arg.text;
+	}
+	outSynthesizedArgumentsString = ss.str();
+	return true;
+}
+
+int PredaRealListener::FindMatchingOverloadedEvent(std::string eventName, std::string &outSynthesizedArgumentsString)
+{
+	std::vector<PredaParser::ExpressionContext *> argCtxs = ctx->functionCallArguments()->expression();
+	std::vector<ExpressionParser::ExpressionResult> args(argCtxs.size());
+	std::stringstream ss;
+
+	for (size_t i = 0; i < argCtxs.size(); i++)
+	{
+		ExpressionParser::ExpressionResult arg;
+		if (!m_expressionParser.ParseExpression(argCtxs[i], args[i]))
+			return -1;
+
+		if (i > 0)
+			ss << ", ";
+		ss << arg.text;
+	}
+
+	assert(m_definedEvents[ctx].size() > 0);
+
+	bool bFunctionIsOverloaded = (m_definedEvents[ctx].size() > 1);
+
+	for (size_t i = 0; i < m_definedEvents[ctx].size(); i++)
+	{
+		const transpiler::FunctionSignature &eventSignature = m_definedEvents[ctx];
+		if (eventSignature.parameters.size() != argCtxs.size())
+		{
+			// When there's no function overload, we provide a detailed error, otherwise skip to the next overloaded version
+			if (!bFunctionIsOverloaded)
+			{
+				m_errorPortal.SetAnchor(ctx->start);
+				m_errorPortal.AddArgumentListLengthMismatchError(eventSignature.parameters.size(), argCtxs.size());
+				return -1;
+			}
+			else
+				continue;
+		}
+
+		bool parameterListMatch = true;
+
+		for (size_t j = 0; j < argCtxs.size(); j++)
+		{
+			if (args[j].type.baseConcreteType != eventSignature.parameters[j]->qualifiedType.baseConcreteType)
+			{
+				if (!bFunctionIsOverloaded)
+				{
+					m_errorPortal.SetAnchor(argCtxs[j]->start);
+					m_errorPortal.AddTypeMismatchError(eventSignature.parameters[j]->qualifiedType.baseConcreteType, args[j].type.baseConcreteType);
+					return -1;
+				}
+				else
+				{
+					parameterListMatch = false;
+					break;
+				}
+			}
+
+			if (args[j].type.bIsConst && !eventSignature.parameters[j]->qualifiedType.bIsConst && args[j].type.baseConcreteType->IsConstTransitive())
+			{
+				if (!bFunctionIsOverloaded)
+				{
+					m_errorPortal.SetAnchor(argCtxs[j]->start);
+					m_errorPortal.AddAssignConstReferenceTypeToNonConstError(args[j].type.baseConcreteType);
+					return -1;
+				}
+				else
+				{
+					parameterListMatch = false;
+					break;
+				}
+			}
+		}
+
+		if (parameterListMatch)
+		{
+			if ((eventSignature.flags & uint32_t(transpiler::FunctionFlags::CallableFromSystem)) != 0)
+			{
+				m_errorPortal.SetAnchor(ctx->start);
+				m_errorPortal.AddCallSystemReservedFunctionError();
+				return -1;
+			}
+			return int(i);
+		}
+	}
+
+	m_errorPortal.SetAnchor(ctx->start);
+	m_errorPortal.AddNoMatchingOverloadedFunctionError();
+	return -1;
+}
+
+bool PredaRealListener::GenEventSignatureFromEventDeclareCtx(PredaParser::EventDeclarationContext *declCtx, transpiler::EventSignature &outSig)
+{
+	if (!declCtx)
+		return false;
+
+	std::string eventName = declCtx->identifier()->getText();
+	// parameters
+	std::vector<PredaParser::FunctionParameterContext *> vParamCtx = declCtx->functionParameterList()->functionParameter();
+	for (size_t i = 0; i < vParamCtx.size(); i++)
+	{
+		ConcreteTypePtr pType = m_identifierHub.GetTypeFromTypeNameContext(vParamCtx[i]->typeName());
+		if (pType == nullptr)
+			return false;
+
+		transpiler::DefinedIdentifierPtr pDefinedVariable = DefineFunctionLocalVariable(pType, vParamCtx[i]->identifier(), true, 0);
+		if (pDefinedVariable == nullptr)
+			return false;
+	}
+	outSig.parameters = m_transpilerCtx.functionCtx.localScopes.back().concreteType->members;
+
+	return true;
+}
+
+bool PredaRealListener::GenEventSignatureFromEventStatementCtx(PredaParser::EventStatementContext *ctx, transpiler::EventSignature &outSig)
+{
+	// if (!ctx)
+	// 	return false;
+
+	// std::string eventName = ctx->identifier()->getText();
+	// std::vector<PredaParser::ExpressionContext *> argCtxs = ctx->functionCallArguments()->expression();
+
+	// std::stringstream ss;
+	// ss << std::quoted(eventName);
+
+	// for (size_t i = 0; i < argCtxs.size(); i++)
+	// {
+	// 	// function parameters are defined in the current scope (function scope)
+	// 	ExpressionParser::ExpressionResult arg;
+	// 	if (!m_expressionParser.ParseExpression(argCtxs[i], arg))
+	// 		return false;
+
+	// 	// skip arguments that are of void type
+	// 	if (arg.type.baseConcreteType == nullptr)
+	// 		continue;
+
+	// 	transpiler::DefinedIdentifierPtr pDefinedVariable = DefineFunctionLocalVariable(pType, vParamCtx[i]->identifier(), false, 0);
+	// 	if (pDefinedVariable == nullptr)
+	// 		return false;
+	// }
+	// outSig.parameters = m_transpilerCtx.functionCtx.localScopes.back().concreteType->members;
+
+	return true;
+}
