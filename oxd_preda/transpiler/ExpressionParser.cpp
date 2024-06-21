@@ -5,7 +5,7 @@
 
 using ConcreteTypePtr = transpiler::ConcreteTypePtr;
 
-void GetIntergerWidthAndSignFromLiteralSuffix(const std::string &integerLiteral, std::string &outIntegerBody, size_t &outBitWidth, bool &outIsSigned)
+void GetIntegerWidthAndSignFromLiteralSuffix(const std::string &integerLiteral, std::string &outIntegerBody, size_t &outBitWidth, bool &outIsSigned)
 {
 	size_t signCharPos = std::string::npos;
 
@@ -323,7 +323,7 @@ bool ExpressionParser::ParsePrimaryExpression(PredaParser::PrimaryExpressionCont
 		std::string literalBody;
 		size_t bitWidth;
 		bool bIsSigned;
-		GetIntergerWidthAndSignFromLiteralSuffix(ctx->getText(), literalBody, bitWidth, bIsSigned);
+		GetIntegerWidthAndSignFromLiteralSuffix(ctx->getText(), literalBody, bitWidth, bIsSigned);
 		if (!IsIntegerLiteralInRange(literalBody, bitWidth, bIsSigned, ctx->DecimalIntegerLiteral() ? 10 : 16))
 		{
 			m_pErrorPortal->SetAnchor(ctx->start);
@@ -502,7 +502,7 @@ bool ExpressionParser::ParseExpression_Internal(PredaParser::ExpressionContext *
 			std::string literalBody;
 			size_t bitWidth;
 			bool bIsSigned;
-			GetIntergerWidthAndSignFromLiteralSuffix("-" + ctx->expression(0)->getText(), literalBody, bitWidth, bIsSigned);
+			GetIntegerWidthAndSignFromLiteralSuffix("-" + ctx->expression(0)->getText(), literalBody, bitWidth, bIsSigned);
 			if (!IsIntegerLiteralInRange(literalBody, bitWidth, bIsSigned, ctx->expression(0)->primaryExpression()->DecimalIntegerLiteral() ? 10 : 16))
 			{
 				m_pErrorPortal->SetAnchor(ctx->start);

@@ -66,7 +66,7 @@ public:
 	void AddExportFunctionNameConflictError();
 	void AddRelayFunctionCannotBeTransactionOrPublicError();
 	void AddEmptyStructError();
-	void AddContractNameMistachError(const std::string &nameInCode, const std::string &nameInParam);
+	void AddContractNameMismatchError(const std::string &nameInCode, const std::string &nameInParam);
 	void AddNoReturnFromFunctionWithReturnTypeError();
 	void AddMinedDependencyWithRelayError();
 	void AddNoMatchingOverloadedFunctionError();
@@ -123,6 +123,8 @@ public:
 	void AddMultipleConstructorError();
 	void AddDeployInNonGlobalError();
 	void AddUseCurrentContractTypeError();
+	void AddEventRedefinitionError(const std::string &identifier);
+	void AddEventCallMissingArgumentListError();
 
 	void AddSyntaxError(uint32_t line, uint32_t pos, const std::string &msg);
 	void AddInternalError(uint32_t line, uint32_t pos, const std::string &msg);

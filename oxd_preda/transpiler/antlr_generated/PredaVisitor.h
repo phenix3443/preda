@@ -61,6 +61,8 @@ public:
 
     virtual antlrcpp::Any visitAccessSpecifier(PredaParser::AccessSpecifierContext *context) = 0;
 
+    virtual antlrcpp::Any visitEventDeclaration(PredaParser::EventDeclarationContext *context) = 0;
+
     virtual antlrcpp::Any visitVariableDeclaration(PredaParser::VariableDeclarationContext *context) = 0;
 
     virtual antlrcpp::Any visitTypeNameOrAuto(PredaParser::TypeNameOrAutoContext *context) = 0;
@@ -84,6 +86,8 @@ public:
     virtual antlrcpp::Any visitStatement(PredaParser::StatementContext *context) = 0;
 
     virtual antlrcpp::Any visitExpressionStatement(PredaParser::ExpressionStatementContext *context) = 0;
+
+    virtual antlrcpp::Any visitEventStatement(PredaParser::EventStatementContext *context) = 0;
 
     virtual antlrcpp::Any visitIfStatement(PredaParser::IfStatementContext *context) = 0;
 

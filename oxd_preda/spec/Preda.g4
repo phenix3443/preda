@@ -33,7 +33,8 @@ contractPart
   | structDefinition
   | enumDefinition
   | interfaceDefinition
-  | functionDefinition;
+  | functionDefinition
+  | eventDeclaration;
 
 stateVariableDeclaration
   : doxygen? annotation? scope? typeName identifier ';';
@@ -59,7 +60,6 @@ enumDefinition
 
 functionDefinition
   : functionDeclaration '{' statement* '}' ;
-  
 functionDeclaration
   : doxygen? annotation? scope? FunctionKeyword functionReturnTypeName? identifier '(' functionParameterList ')' accessSpecifier* ConstantKeyword? ;
 
@@ -74,6 +74,9 @@ functionParameter
 
 accessSpecifier
   : (PublicKeyword | ExportKeyword);
+
+eventDeclaration
+  : EventKeyword identifier '(' functionParameterList ')' ';' ;
 
 variableDeclaration
   : typeName identifier;
@@ -118,10 +121,14 @@ statement
   | returnStatement
   | relayStatement
   | variableDeclarationStatement
-  | expressionStatement ;
+  | expressionStatement 
+  | eventStatement;
 
 expressionStatement
   : expression ';' ;
+
+eventStatement
+  : EmitKeyword identifier '(' functionCallArguments ')' ';';
 
 ifStatement
   : ifWithBlock elseIfWithBlock* elseWithBlock?;
@@ -267,6 +274,8 @@ InterfaceKeyword : 'interface';
 ImplementsKeyword : 'implements';
 DeployKeyword : 'deploy';
 ConstructorKeyword : 'constructor';
+EventKeyword : 'event';
+EmitKeyword : 'emit';
 
 FloatType
   : 'float256' | 'float512' | 'float1024' ;

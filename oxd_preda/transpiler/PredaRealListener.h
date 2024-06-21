@@ -61,6 +61,7 @@ public:
 	std::vector<std::pair<PredaParser::StructDefinitionContext*, ConcreteTypePtr>> m_definedStructs;
 	std::vector<std::pair<PredaParser::EnumDefinitionContext*, ConcreteTypePtr>> m_definedEnums;
 	std::vector<ConcreteTypePtr> m_definedInterfaces;
+    std::vector<std::string> m_definedEvents;
 
 	ErrorPortal m_errorPortal;
 	IdentifierHub m_identifierHub;
@@ -221,6 +222,8 @@ private:
 	size_t ExportFunction(transpiler::FunctionRef functionRef);
 	void PropagateFunctionFlagAcrossCallingGraph();
 	void TraverseAllFunctions();
+	void DeclareEvent(PredaParser::EventDeclarationContext *ctx);
+	bool GenerateEventNotifyArguments(PredaParser::EventStatementContext *ctx, std::string &outSynthesizedArgumentsString);
 
 public:
 	// interface inherited from PredaListener
@@ -258,4 +261,6 @@ public:
 	//virtual void exitRelayLambdaDefinition(PredaParser::RelayLambdaDefinitionContext *ctx) override;
 	virtual void enterPredaSource(PredaParser::PredaSourceContext * /*ctx*/) override;
   	//virtual void enterDoxygen(PredaParser::DoxygenContext * /*ctx*/) override;
+
+	virtual void enterEventStatement(PredaParser::EventStatementContext *ctx) override;
 };

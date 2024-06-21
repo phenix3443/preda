@@ -6,7 +6,8 @@
 namespace transpiler {
 
 	// no-longer used codes are only commented out but not removed to avoid code value ambiguity
-	enum class ErrorCode : uint32_t {
+	enum class ErrorCode : uint32_t
+	{
 		NoError = 0,
 		IdentifierRedefinition = 1,
 		IdentifierTwoUnderscore = 2,
@@ -22,7 +23,7 @@ namespace transpiler {
 		ReturnValueFromFunctionWithoutReturnType = 12,
 		ReturnWithoutValueFromFunctionWithReturnType = 13,
 		BooleanExpressionExpected = 14,
-		//RelayFromNoneAddressFunction = 15,
+		// RelayFromNoneAddressFunction = 15,
 		RelayTargetAddressNotAddressType = 16,
 		IdentifierNotDefined = 17,
 		RelayToNoneFunction = 18,
@@ -37,7 +38,7 @@ namespace transpiler {
 		ExportFunctionNameConflict = 27,
 		RelayFunctionCannotBeTransactionOrPublic = 28,
 		EmptyStruct = 29,
-		ContractNameMistach = 30,
+		ContractNameMismatch = 30,
 		NoReturnFromFunctionWithReturnType = 31,
 		MinedDependencyWithRelay = 32,
 		NoMatchingOverloadedFunction = 33,
@@ -62,7 +63,7 @@ namespace transpiler {
 		ReservedFunctionMayNotHaveParameters = 52,
 		ReservedFunctionHasTooHighBlockDependency = 53,
 		ReservedFunctionHasTransactionDependency = 54,
-		//AssetNameUnavailable = 55,
+		// AssetNameUnavailable = 55,
 		RelayToFunctionWithConstMoveOnlyParam = 56,
 		ContractNameAlreadyUsed = 57,
 		ReservedFunctionCannotBePublicOrExport = 58,
@@ -72,11 +73,11 @@ namespace transpiler {
 		FunctionCallMissingArgumentList = 62,
 		ContractVariableDeclarationWithoutInitializer = 63,
 		IllegalReferenceToNonStaticMember = 64,
-		//IssueCannotBroadcast = 65,
-		//RelayCannotToMiner = 66,
-		//IssueOutsideSystemFunction = 67,
+		// IssueCannotBroadcast = 65,
+		// RelayCannotToMiner = 66,
+		// IssueOutsideSystemFunction = 67,
 		CallSystemReservedFunction = 68,
-		//ReservedFunctionHasRelay = 69,
+		// ReservedFunctionHasRelay = 69,
 		RelayShardsToFunctionWithMoveOnlyParam = 70,
 		RelayShardsOutsideGlobal = 71,
 		RelayGlobalFromGlobal = 72,
@@ -96,6 +97,8 @@ namespace transpiler {
 		MultipleConstructor = 86,
 		DeployInNonGlobal = 87,
 		UseCurrentContractType = 88,
+		EventRedefinition = 89,
+		EventCallMissingArgumentList = 90,
 
 		SyntaxError = 0x7fff,
 		InternalError = 0xffff,

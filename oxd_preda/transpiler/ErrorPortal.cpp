@@ -173,9 +173,9 @@ void ErrorPortal::AddEmptyStructError()
 	AddError(ErrorCode::EmptyStruct, "empty struct type not allowed.");
 }
 
-void ErrorPortal::AddContractNameMistachError(const std::string &nameInCode, const std::string &nameInParam)
+void ErrorPortal::AddContractNameMismatchError(const std::string &nameInCode, const std::string &nameInParam)
 {
-	AddError(ErrorCode::ContractNameMistach, "contract name in source code \"" + nameInCode + "\" differs from given name \"" + nameInParam + "\".");
+	AddError(ErrorCode::ContractNameMismatch, "contract name in source code \"" + nameInCode + "\" differs from given name \"" + nameInParam + "\".");
 }
 
 void ErrorPortal::AddNoReturnFromFunctionWithReturnTypeError()
@@ -479,4 +479,13 @@ void ErrorPortal::AddInternalError(antlr4::Token *token, const std::string &msg)
 void ErrorPortal::AddCompileWarning(uint32_t line, uint32_t pos, const std::string &msg)
 {
 	m_warnings.emplace_back(line, pos, ErrorCode::InternalError, msg);
+}
+void ErrorPortal::AddEventRedefinitionError(const std::string &identifier)
+{
+	AddError(ErrorCode::EventRedefinition, "Event \"" + identifier + "\" already defined.");
+}
+
+void ErrorPortal::AddEventCallMissingArgumentListError()
+{
+	AddError(ErrorCode::EventCallMissingArgumentList, "event call missing argument list.");
 }

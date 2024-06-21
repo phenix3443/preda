@@ -35,7 +35,7 @@ private:
 		rvm::ContractVersionId cvId;
 		const rvm::ContractVersionId *importedCvIds;
 		uint32_t numImportedContracts;
-		uint32_t funtionFlags;
+		uint32_t functionFlags;
 	};
 	std::vector<ContractStackEntry> m_contractStack;
 	std::unordered_map<prlrt::CBigInt*, std::unique_ptr<prlrt::CBigInt>> m_bigint;
@@ -50,6 +50,7 @@ private:
 	uint32_t m_remainingGas = 0;
 
 	std::string m_logOutputBuffer;
+	std::string m_eventBuffer;
 	std::stack<prlrt::ExceptionType> exec_stack;
 	prlrt::ExceptionType* curr_exc = nullptr;
 
@@ -97,7 +98,7 @@ public:
 	{
 		m_contractStack.clear();
 	}
-	void TurnOhphanTokenReportOnOff(bool bOn)
+	void TurnOrphanTokenReportOnOff(bool bOn)
 	{
 		m_bReportOrphanToken = bOn;
 	}

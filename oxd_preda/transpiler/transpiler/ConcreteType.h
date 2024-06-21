@@ -233,7 +233,8 @@ namespace transpiler {
 	//   placeholder for unnamed scopes
 	struct ConcreteType : public std::enable_shared_from_this<ConcreteType>
 	{
-		enum TypeCategory {
+		enum TypeCategory
+		{
 			ValueType,
 			ReferenceType,
 			EnumType,
@@ -282,7 +283,7 @@ namespace transpiler {
 		ConcreteTypePtr CreateInnerUserDefinedStructType(const std::string &typeName);
 		ConcreteTypePtr CreateInnerEnumType(const std::string &typeName);
 		ConcreteTypePtr CreateInnerAliasType(const std::string &typeName, ConcreteTypePtr realType);
-		ConcreteTypePtr CreateInnerInterfaceType(const std::string& typeName);
+		ConcreteTypePtr CreateInnerInterfaceType(const std::string &typeName);
 
 		bool IsConstTransitive()
 		{
