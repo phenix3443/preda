@@ -340,156 +340,156 @@ bool SimuGlobalShard::CommitDeployment(const BuildContracts& built)
 	return true;
 }
 
-	bool SimuGlobalShard::CheckDeployedContract(const BuildContracts& built)
-	{
-		ASSERT(_bDeploying);
-		auto* compiled = built._pCompiled;
-		ASSERT(compiled);
+bool SimuGlobalShard::CheckDeployedContract(const BuildContracts& built)
+{
+	ASSERT(_bDeploying);
+	auto* compiled = built._pCompiled;
+	ASSERT(compiled);
 
-		uint32_t count = compiled->GetCount();
-		for (uint32_t i = 0; i < count; i++)
-		{
-			auto compiledContract = compiled->GetContract(i);
-			auto deployedContract = GetDeployedContract(built, compiledContract);
-			if (!deployedContract) {
-				return true;
-			}
-			if (!(CheckContractStateVariables(compiledContract, deployedContract) &&
-				CheckStructTypes(compiledContract, deployedContract) &&
-				CheckEnumTypes(compiledContract, deployedContract) &&
-				CheckInterfaceTypes(compiledContract, deployedContract) &&
-				CheckContractExportedFunctions(compiledContract, deployedContract))) {
-				return false;
-			}
+	uint32_t count = compiled->GetCount();
+	for (uint32_t i = 0; i < count; i++)
+	{
+		auto compiledContract = compiled->GetContract(i);
+		auto deployedContract = GetDeployedContract(built, compiledContract);
+		if (!deployedContract) {
+			return true;
 		}
-		return true;
-	}
-
-
-	const rvm::Contract* SimuGlobalShard::GetDeployedContract(const BuildContracts& built, const rvm::Contract* compiledContract)
-	{
-		auto name = compiledContract->GetName();
-		rt::String fullName = _pSimulator->DAPP_NAME + '.' + name.Str();
-		rvm::ConstString s = { fullName.Begin(), (uint32_t)fullName.GetLength() };
-		auto cvid = _GetDeployedContractByName(&s);
-		if (cvid == rvm::ContractVersionIdInvalid)
-		{
-			return NULL;
-		}
-		auto deployedContract = _details::GetDeployedContract(built._pEngine, cvid);
-		return deployedContract;
-	}
-
-	bool SimuGlobalShard::CheckContractStateVariables(const rvm::Contract* compiledContract, const rvm::Contract* deployedContract)
-	{
-		auto count = compiledContract->GetScopeCount();
-		if (count != deployedContract->GetScopeCount())
-		{
-			_LOG_WARNING("Contract state variables count check failed for upgrade");
+		if (!(CheckContractStateVariables(compiledContract, deployedContract) &&
+			CheckStructTypes(compiledContract, deployedContract) &&
+			CheckEnumTypes(compiledContract, deployedContract) &&
+			CheckInterfaceTypes(compiledContract, deployedContract) &&
+			CheckContractExportedFunctions(compiledContract, deployedContract))) {
 			return false;
 		}
-		for (uint32_t i = 0; i < count; i++)
-		{
-			auto scope = compiledContract->GetScope(i);
-			rvm::StringStreamImpl compiledSig;
-			rvm::StringStreamImpl deployedSig;
-			ASSERT(compiledContract->GetStateSignature(scope, &compiledSig));
-			ASSERT(deployedContract->GetStateSignature(scope, &deployedSig));
-			if (!compiledSig.GetString().Str().CaseInsensitiveEqual(deployedSig.GetString().Str()))
-			{
-				_LOG_WARNING("Contract state variables signature check failed for upgrade");
-				return false;
-			}
-		}
-		return true;
 	}
+	return true;
+}
 
-	bool SimuGlobalShard::CheckStructTypes(const rvm::Contract* compiledContract, const rvm::Contract* deployedContract)
+
+const rvm::Contract* SimuGlobalShard::GetDeployedContract(const BuildContracts& built, const rvm::Contract* compiledContract)
+{
+	auto name = compiledContract->GetName();
+	rt::String fullName = _pSimulator->DAPP_NAME + '.' + name.Str();
+	rvm::ConstString s = { fullName.Begin(), (uint32_t)fullName.GetLength() };
+	auto cvid = _GetDeployedContractByName(&s);
+	if (cvid == rvm::ContractVersionIdInvalid)
 	{
-		auto count = compiledContract->GetStructCount();
-		if (count != deployedContract->GetStructCount())
+		return NULL;
+	}
+	auto deployedContract = _details::GetDeployedContract(built._pEngine, cvid);
+	return deployedContract;
+}
+
+bool SimuGlobalShard::CheckContractStateVariables(const rvm::Contract* compiledContract, const rvm::Contract* deployedContract)
+{
+	auto count = compiledContract->GetScopeCount();
+	if (count != deployedContract->GetScopeCount())
+	{
+		_LOG_WARNING("Contract state variables count check failed for upgrade");
+		return false;
+	}
+	for (uint32_t i = 0; i < count; i++)
+	{
+		auto scope = compiledContract->GetScope(i);
+		rvm::StringStreamImpl compiledSig;
+		rvm::StringStreamImpl deployedSig;
+		ASSERT(compiledContract->GetStateSignature(scope, &compiledSig));
+		ASSERT(deployedContract->GetStateSignature(scope, &deployedSig));
+		if (!compiledSig.GetString().Str().CaseInsensitiveEqual(deployedSig.GetString().Str()))
+		{
+			_LOG_WARNING("Contract state variables signature check failed for upgrade");
+			return false;
+		}
+	}
+	return true;
+}
+
+bool SimuGlobalShard::CheckStructTypes(const rvm::Contract* compiledContract, const rvm::Contract* deployedContract)
+{
+	auto count = compiledContract->GetStructCount();
+	if (count != deployedContract->GetStructCount())
+	{
+		_LOG_WARNING("Contract struct type count check failed for upgrade");
+		return false;
+	}
+	for (uint32_t i = 0; i < count; i++)
+	{
+		rvm::StringStreamImpl compiledSig;
+		ASSERT(compiledContract->GetStructSignature(i, &compiledSig));
+		rvm::StringStreamImpl deployedSig;
+		ASSERT(deployedContract->GetStructSignature(i, &deployedSig));
+		if (!compiledSig.GetString().Str().CaseInsensitiveEqual(deployedSig.GetString().Str()))
 		{
 			_LOG_WARNING("Contract struct type count check failed for upgrade");
 			return false;
 		}
-		for (uint32_t i = 0; i < count; i++)
-		{
-			rvm::StringStreamImpl compiledSig;
-			ASSERT(compiledContract->GetStructSignature(i, &compiledSig));
-			rvm::StringStreamImpl deployedSig;
-			ASSERT(deployedContract->GetStructSignature(i, &deployedSig));
-			if (!compiledSig.GetString().Str().CaseInsensitiveEqual(deployedSig.GetString().Str()))
-			{
-				_LOG_WARNING("Contract struct type count check failed for upgrade");
-				return false;
-			}
-		}
-		return true;
 	}
+	return true;
+}
 
-	bool SimuGlobalShard::CheckEnumTypes(const rvm::Contract* compiledContract, const rvm::Contract* deployedContract)
+bool SimuGlobalShard::CheckEnumTypes(const rvm::Contract* compiledContract, const rvm::Contract* deployedContract)
+{
+	auto count = compiledContract->GetEnumCount();
+	if (count != deployedContract->GetEnumCount())
 	{
-		auto count = compiledContract->GetEnumCount();
-		if (count != deployedContract->GetEnumCount())
+		_LOG_WARNING("Contract enum type count check failed for upgrade");
+		return false;
+	}
+	for (uint32_t i = 0; i < count; i++)
+	{
+		rvm::StringStreamImpl compiledSig;
+		ASSERT(compiledContract->GetEnumSignature(i, &compiledSig));
+		rvm::StringStreamImpl deployedSig;
+		ASSERT(deployedContract->GetEnumSignature(i, &deployedSig));
+		if (!compiledSig.GetString().Str().CaseInsensitiveEqual(deployedSig.GetString().Str()))
 		{
 			_LOG_WARNING("Contract enum type count check failed for upgrade");
 			return false;
 		}
-		for (uint32_t i = 0; i < count; i++)
-		{
-			rvm::StringStreamImpl compiledSig;
-			ASSERT(compiledContract->GetEnumSignature(i, &compiledSig));
-			rvm::StringStreamImpl deployedSig;
-			ASSERT(deployedContract->GetEnumSignature(i, &deployedSig));
-			if (!compiledSig.GetString().Str().CaseInsensitiveEqual(deployedSig.GetString().Str()))
-			{
-				_LOG_WARNING("Contract enum type count check failed for upgrade");
-				return false;
-			}
-		}
-		return true;
+	}
+	return true;
+}
+
+bool SimuGlobalShard::CheckInterfaceTypes(const rvm::Contract* compiledContract, const rvm::Contract* deployedContract)
+{
+	auto count = compiledContract->GetInterfaceCount();
+	if (count != deployedContract->GetInterfaceCount())
+	{
+		_LOG_WARNING("Contract interface type count check failed for upgrade");
+		return false;
+	}
+	for (uint32_t i = 0; i <count; i++)
+	{
+		auto* compiledInf = compiledContract->GetInterface(i);
+		auto* deployedInf = deployedContract->GetInterface(i);
+		// TODO
+	}
+	return true;
+}
+
+bool SimuGlobalShard::CheckContractExportedFunctions(const rvm::Contract* compiledContract, const rvm::Contract* deployedContract)
+{
+	uint32_t count = compiledContract->GetFunctionCount();
+	if (count != deployedContract->GetFunctionCount())
+	{
+		_LOG_WARNING("Contract function count check failed for upgrade");
+		return false;
 	}
 
-	bool SimuGlobalShard::CheckInterfaceTypes(const rvm::Contract* compiledContract, const rvm::Contract* deployedContract)
+	for (uint32_t i = 0; i < count; i++)
 	{
-		auto count = compiledContract->GetInterfaceCount();
-		if (count != deployedContract->GetInterfaceCount())
+		rvm::StringStreamImpl compiledSig;
+		ASSERT(compiledContract->GetFunctionSignature(i, &compiledSig));
+		rvm::StringStreamImpl deployedSig;
+		ASSERT(deployedContract->GetFunctionSignature(i, &deployedSig));
+		if (!compiledSig.GetString().Str().CaseInsensitiveEqual(deployedSig.GetString().Str()))
 		{
-			_LOG_WARNING("Contract interface type count check failed for upgrade");
+			_LOG_WARNING("Contract  function signature count check failed for upgrade");
 			return false;
 		}
-		for (uint32_t i = 0; i <count; i++)
-		{
-			auto* compiledInf = compiledContract->GetInterface(i);
-			auto* deployedInf = deployedContract->GetInterface(i);
-			// TODO
-		}
-		return true;
 	}
-
-	bool SimuGlobalShard::CheckContractExportedFunctions(const rvm::Contract* compiledContract, const rvm::Contract* deployedContract)
-	{
-		uint32_t count = compiledContract->GetFunctionCount();
-		if (count != deployedContract->GetFunctionCount())
-		{
-			_LOG_WARNING("Contract function count check failed for upgrade");
-			return false;
-		}
-
-		for (uint32_t i = 0; i < count; i++)
-		{
-			rvm::StringStreamImpl compiledSig;
-			ASSERT(compiledContract->GetFunctionSignature(i, &compiledSig));
-			rvm::StringStreamImpl deployedSig;
-			ASSERT(deployedContract->GetFunctionSignature(i, &deployedSig));
-			if (!compiledSig.GetString().Str().CaseInsensitiveEqual(deployedSig.GetString().Str()))
-			{
-				_LOG_WARNING("Contract  function signature count check failed for upgrade");
-				return false;
-			}
-		}
-		return true;
-	}
+	return true;
+}
 
 rvm::ContractVersionId SimuGlobalShard::_GetContractByName(const rvm::ConstString* dapp_contract_name) const
 {
@@ -503,19 +503,19 @@ rvm::ContractVersionId SimuGlobalShard::_GetContractByName(const rvm::ConstStrin
 	return r;
 }
 
-	rvm::ContractVersionId SimuGlobalShard::_GetDeployedContractByName(const rvm::ConstString* dapp_contract_name) const
+rvm::ContractVersionId SimuGlobalShard::_GetDeployedContractByName(const rvm::ConstString* dapp_contract_name) const
+{
+	rvm::ContractVersionId r = _Contracts.get(dapp_contract_name->Str(), rvm::ContractVersionIdInvalid);
+	if (_bDeploying)
 	{
-		rvm::ContractVersionId r = _Contracts.get(dapp_contract_name->Str(), rvm::ContractVersionIdInvalid);
-		if (_bDeploying)
+		auto deploying_cvid = _DeployingDatabase._Contracts.get(dapp_contract_name->Str(), rvm::ContractVersionIdInvalid);
+		if (deploying_cvid == r)
 		{
-			auto deploying_cvid = _DeployingDatabase._Contracts.get(dapp_contract_name->Str(), rvm::ContractVersionIdInvalid);
-			if (deploying_cvid == r)
-			{
-				return rvm::ContractVersionIdInvalid;
-			}
+			return rvm::ContractVersionIdInvalid;
 		}
-		return r;
 	}
+	return r;
+}
 
 void SimuGlobalShard::Term()
 {
